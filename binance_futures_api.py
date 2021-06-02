@@ -11,35 +11,34 @@ def get_timestamp():
 
 query = 100
 
-def KLINE_INTERVAL_1HOUR():
-    return client.futures_klines(symbol=config.pairname, limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
+def KLINE_INTERVAL_1HOUR(i):
+    return client.futures_klines(symbol=config.pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
 
-def position_information():
-    return client.futures_position_information(symbol=config.pairname, timestamp=get_timestamp())
+def position_information(i):
+    return client.futures_position_information(symbol=config.pair[i], timestamp=get_timestamp())
 
-def get_position_amount():
-    return float(position_information()[0].get('positionAmt'))
+def get_position_amount(i):
+    return float(position_information(i)[0].get('positionAmt'))
 
-def change_leverage(leverage):
-    return client.futures_change_leverage(symbol=config.pairname, leverage=leverage, timestamp=get_timestamp())
+def change_leverage(i, leverage):
+    return client.futures_change_leverage(symbol=config.pair[i], leverage=leverage, timestamp=get_timestamp())
 
-def change_margin_to_ISOLATED():
-    return client.futures_change_margin_type(symbol=config.pairname, marginType="ISOLATED", timestamp=get_timestamp())
+def change_margin_to_ISOLATED(i):
+    return client.futures_change_margin_type(symbol=config.pair[i], marginType="ISOLATED", timestamp=get_timestamp())
 
-def change_margin_to_CROSSED():
-    return client.futures_change_margin_type(symbol=config.pairname, marginType="CROSSED", timestamp=get_timestamp())
+def change_margin_to_CROSSED(i):
+    return client.futures_change_margin_type(symbol=config.pair[i], marginType="CROSSED", timestamp=get_timestamp())
 
-def open_long_position():
-    client.futures_create_order(symbol=config.pairname, side="BUY", type="MARKET", quantity=config.amount, timestamp=get_timestamp())
+def open_long_position(i):
+    client.futures_create_order(symbol=config.pair[i], side="BUY", type="MARKET", quantity=config.quantity[i], timestamp=get_timestamp())
 
-def open_short_position():
-    client.futures_create_order(symbol=config.pairname, side="SELL", type="MARKET", quantity=config.amount, timestamp=get_timestamp())
+def open_short_position(i):
+    client.futures_create_order(symbol=config.pair[i], side="SELL", type="MARKET", quantity=config.quantity[i], timestamp=get_timestamp())
 
-def close_long():
-    positionAmt = abs(get_position_amount())
-    client.futures_create_order(symbol=config.pairname, side="SELL", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
+def close_long(i):
+    positionAmt = abs(get_position_amount(i))
+    client.futures_create_order(symbol=config.pair[i], side="SELL", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
 
-def close_short():
-    positionAmt = abs(get_position_amount())
-    client.futures_create_order(symbol=config.pairname, side="BUY", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
-
+def close_short(i):
+    positionAmt = abs(get_position_amount(i))
+    client.futures_create_order(symbol=config.pair[i], side="BUY", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())

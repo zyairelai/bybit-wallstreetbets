@@ -17,13 +17,9 @@ try:
         # if not os.path.exists("BACKTEST"): os.makedirs("BACKTEST")
 
     def added_to_job():
-        binance_longterm.lets_make_some_money()
-
-    while True:
         try:
-            scheduler = BlockingScheduler()
-            scheduler.add_job(added_to_job, 'cron', minute='0,10,20,30,40,50')
-            scheduler.start()
+            for i in range(len(config.pair)):
+                binance_longterm.lets_make_some_money(i)
 
         except (socket.timeout,
                 BinanceAPIException,
@@ -35,8 +31,13 @@ try:
                 ConnectionResetError, KeyError, OSError) as e:
 
             if not os.path.exists("ERROR"): os.makedirs("ERROR")
-            with open((os.path.join("ERROR", config.pairname + ".txt")), "a", encoding="utf-8") as error_message:
-                error_message.write("[!] " + config.pairname + " - " + "Created at : " + datetime.today().strftime("%d-%m-%Y @ %H:%M:%S") + "\n")
+            with open((os.path.join("ERROR", config.pair[i] + ".txt")), "a", encoding="utf-8") as error_message:
+                error_message.write("[!] " + config.pair[i] + " - " + "Created at : " + datetime.today().strftime("%d-%m-%Y @ %H:%M:%S") + "\n")
                 error_message.write(str(e) + "\n\n")
+
+    while True:
+            scheduler = BlockingScheduler()
+            scheduler.add_job(added_to_job, 'cron', minute='0,10,20,30,40,50')
+            scheduler.start()
 
 except KeyboardInterrupt: print("\n\nAborted.\n")

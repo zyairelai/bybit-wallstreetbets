@@ -22,12 +22,12 @@ def calculating_EMA(digit, dataset):
 def current_EMA(EMA_list): return EMA_list[-1]
 def previous_EMA(EMA_list):return EMA_list[-2]
 
-def lets_make_some_money():
-    response = binance_futures_api.position_information()[0]
-    position_Amt = binance_futures_api.get_position_amount()
-    klines_1HOUR = binance_futures_api.KLINE_INTERVAL_1HOUR()
+def lets_make_some_money(i):
+    response = binance_futures_api.position_information(i)[0]
+    position_Amt = binance_futures_api.get_position_amount(i)
+    klines_1HOUR = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
     
-    leverage = config.leverage
+    leverage = config.leverage[i]
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(leverage)
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED()
 
@@ -38,25 +38,26 @@ def lets_make_some_money():
     current_ema_low   = current_EMA(low_EMA_list)
     current_ema_high  = current_EMA(high_EMA_list)
 
+    print(config.pair[i])
     if position_Amt > 0:
         if current_ema_low < current_ema_high:
-            if live_trade: binance_futures_api.close_long()
+            if live_trade: binance_futures_api.close_long(i)
             print("ACTION           :   💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
     elif position_Amt < 0:
         if current_ema_low > current_ema_high:
-            if live_trade: binance_futures_api.close_short()
+            if live_trade: binance_futures_api.close_short(i)
             print("ACTION           :   💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
 
     else:
         if current_ema_low > current_ema_high:
-            if live_trade: binance_futures_api.open_long_position()
+            if live_trade: binance_futures_api.open_long_position(i)
             print(colored("ACTION           :   🚀 GO_LONG 🚀", "green"))
 
         elif current_ema_low < current_ema_high:
-            if live_trade: binance_futures_api.open_short_position()
+            if live_trade: binance_futures_api.open_short_position(i)
             print(colored("ACTION           :   💥 GO_SHORT 💥", "red"))
 
         else: print("ACTION           :   🐺 WAIT 🐺")
