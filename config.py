@@ -4,8 +4,8 @@ enable_scheduler = False
 lower_EMA  = 3
 higher_EMA = 7
 
-coin     = ["BNB", "DOGE", "IOTA"]
-quantity = [0.05, 50, 15]
+coin     = ["IOTA", "KAVA", "KNC"] # "1INCH", "ETC", "CRV"
+quantity = [15, 4, 8]
 leverage = 20
 
 pair = []
