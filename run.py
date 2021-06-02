@@ -14,7 +14,6 @@ try:
         print(colored("LIVE TRADE IS ENABLED\n", "green"))
     else:
         print(colored("THIS IS BACKTESTING\n", "red"))
-        # if not os.path.exists("BACKTEST"): os.makedirs("BACKTEST")
 
     def added_to_job():
         try:
@@ -35,9 +34,11 @@ try:
                 error_message.write("[!] " + config.pair[i] + " - " + "Created at : " + datetime.today().strftime("%d-%m-%Y @ %H:%M:%S") + "\n")
                 error_message.write(str(e) + "\n\n")
 
-    while True:
+    if config.enable_scheduler:
+        while True:
             scheduler = BlockingScheduler()
             scheduler.add_job(added_to_job, 'cron', minute='0,10,20,30,40,50')
             scheduler.start()
+    else: added_to_job()
 
 except KeyboardInterrupt: print("\n\nAborted.\n")

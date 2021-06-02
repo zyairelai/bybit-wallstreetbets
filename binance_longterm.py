@@ -25,13 +25,13 @@ def previous_EMA(EMA_list):return EMA_list[-2]
 def lets_make_some_money(i):
     response = binance_futures_api.position_information(i)[0]
     position_Amt = binance_futures_api.get_position_amount(i)
-    klines_1HOUR = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
+    klines = binance_futures_api.KLINE_INTERVAL_1DAY(i)
     
-    leverage = config.leverage[i]
+    leverage = config.leverage
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
-    dataset = get_closing_price_list(klines_1HOUR)
+    dataset = get_closing_price_list(klines)
     low_EMA_list  = calculating_EMA(lower_EMA, dataset)
     high_EMA_list = calculating_EMA(higher_EMA, dataset)
 
@@ -40,25 +40,31 @@ def lets_make_some_money(i):
 
     print(config.pair[i])
     if position_Amt > 0:
-        if current_ema_low < current_ema_high:
+        if GOING_DOWN(current_ema_low, current_ema_high):
             if live_trade: binance_futures_api.close_long(i)
             print("ACTION           :   💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
     elif position_Amt < 0:
-        if current_ema_low > current_ema_high:
+        if GOING_UP(current_ema_low, current_ema_high):
             if live_trade: binance_futures_api.close_short(i)
             print("ACTION           :   💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
 
     else:
-        if current_ema_low > current_ema_high:
+        if GOING_UP(current_ema_low, current_ema_high):
             if live_trade: binance_futures_api.open_long_position(i)
             print(colored("ACTION           :   🚀 GO_LONG 🚀", "green"))
 
-        elif current_ema_low < current_ema_high:
+        elif GOING_DOWN(current_ema_low, current_ema_high):
             if live_trade: binance_futures_api.open_short_position(i)
             print(colored("ACTION           :   💥 GO_SHORT 💥", "red"))
 
         else: print("ACTION           :   🐺 WAIT 🐺")
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
+
+def GOING_UP(current_ema_low, current_ema_high):
+    if current_ema_low > current_ema_high: return True
+
+def GOING_DOWN(current_ema_low, current_ema_high):
+    if current_ema_low < current_ema_high: return True

@@ -14,6 +14,9 @@ query = 100
 def KLINE_INTERVAL_1HOUR(i):
     return client.futures_klines(symbol=config.pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
 
+def KLINE_INTERVAL_1DAY(i):
+    return client.futures_klines(symbol=config.pair[i], limit=query, interval=Client.KLINE_INTERVAL_1DAY)
+
 def position_information(i):
     return client.futures_position_information(symbol=config.pair[i], timestamp=get_timestamp())
 
