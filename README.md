@@ -1,2 +1,2 @@
 # bybit-longterm
-Long Term low leverage on ByBit
+Long Term low leverage on ByBit/Binance
