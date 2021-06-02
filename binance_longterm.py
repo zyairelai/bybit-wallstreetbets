@@ -28,8 +28,8 @@ def lets_make_some_money(i):
     klines_1HOUR = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
     
     leverage = config.leverage[i]
-    if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(leverage)
-    if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED()
+    if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
+    if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
     dataset = get_closing_price_list(klines_1HOUR)
     low_EMA_list  = calculating_EMA(lower_EMA, dataset)
