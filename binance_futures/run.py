@@ -4,7 +4,7 @@ try:
     import socket
     import urllib3
     import config
-    import binance_longterm
+    import longterm
     from datetime import datetime
     from termcolor import colored
     from binance.exceptions import BinanceAPIException
@@ -18,7 +18,7 @@ try:
     def added_to_job():
         try:
             for i in range(len(config.pair)):
-                binance_longterm.lets_make_some_money(i)
+                longterm.lets_make_some_money(i)
 
         except (socket.timeout,
                 BinanceAPIException,
@@ -37,7 +37,7 @@ try:
     if config.enable_scheduler:
         while True:
             scheduler = BlockingScheduler()
-            scheduler.add_job(added_to_job, 'cron', minute='0,10,20,30,40,50')
+            scheduler.add_job(added_to_job, 'cron', minute='0,20,40')
             scheduler.start()
     else: added_to_job()
 

@@ -24,13 +24,13 @@ def get_position_amount(i):
     return float(position_information(i)[0].get('positionAmt'))
 
 def change_leverage(i, leverage):
-    return client.futures_change_leverage(symbol=config.pair[i], leverage=leverage, timestamp=get_timestamp())
+    client.futures_change_leverage(symbol=config.pair[i], leverage=leverage, timestamp=get_timestamp())
 
 def change_margin_to_ISOLATED(i):
-    return client.futures_change_margin_type(symbol=config.pair[i], marginType="ISOLATED", timestamp=get_timestamp())
+    client.futures_change_margin_type(symbol=config.pair[i], marginType="ISOLATED", timestamp=get_timestamp())
 
 def change_margin_to_CROSSED(i):
-    return client.futures_change_margin_type(symbol=config.pair[i], marginType="CROSSED", timestamp=get_timestamp())
+    client.futures_change_margin_type(symbol=config.pair[i], marginType="CROSSED", timestamp=get_timestamp())
 
 def open_long_position(i):
     client.futures_create_order(symbol=config.pair[i], side="BUY", type="MARKET", quantity=config.quantity[i], timestamp=get_timestamp())
@@ -45,3 +45,9 @@ def close_long(i):
 def close_short(i):
     positionAmt = abs(get_position_amount(i))
     client.futures_create_order(symbol=config.pair[i], side="BUY", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
+
+def get_closing_price_list(klines):
+    closing_price_list = []
+    for candle in range(len(klines)):
+        closing_price_list.append(float(klines[candle][4]))
+    return closing_price_list
