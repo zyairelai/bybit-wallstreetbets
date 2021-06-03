@@ -14,7 +14,7 @@ def run_binance():
     else: print(colored("THIS IS BACKTESTING\n", "red"))
 
     def making_money_from_binance():
-        for i in range(len(config_binance.pair)):
+        for i in range(len(config_binance.coin)):
             longterm_binance.lets_make_some_money(i)
 
     if config_binance.enable_scheduler:
@@ -31,7 +31,7 @@ def run_bybit():
     else: print(colored("THIS IS BACKTESTING\n", "red"))
 
     def making_money_from_bybit():
-        for i in range(len(config_bybit.pair)):
+        for i in range(len(config_bybit.coin)):
             longterm_bybit.lets_make_some_money(i)
 
     if config_bybit.enable_scheduler:

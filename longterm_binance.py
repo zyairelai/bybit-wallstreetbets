@@ -1,6 +1,6 @@
 import EMA
 import config_binance
-import binance_futures_api
+import api_binance_futures
 from datetime import datetime
 from termcolor import colored
 
@@ -9,9 +9,9 @@ lower_EMA  = 3
 higher_EMA = 7
 
 def lets_make_some_money(i):
-    klines = binance_futures_api.KLINE_INTERVAL_1DAY(i)
-    dataset = binance_futures_api.get_closing_price_list(klines)
-    response = binance_futures_api.position_information(i)[0]
+    klines = api_binance_futures.KLINE_INTERVAL_1DAY(i)
+    dataset = api_binance_futures.get_closing_price_list(klines)
+    response = api_binance_futures.position_information(i)[0]
 
     low_EMA_list  = EMA.compute(lower_EMA, dataset)
     high_EMA_list = EMA.compute(higher_EMA, dataset)
@@ -20,29 +20,29 @@ def lets_make_some_money(i):
 
     if live_trade: # Initial Setup
         leverage = config_binance.leverage
-        if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
-        if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
+        if int(response.get("leverage")) != leverage: api_binance_futures.change_leverage(i, leverage)
+        if response.get('marginType') != "isolated": api_binance_futures.change_margin_to_ISOLATED(i)
 
-    print(binance_futures_api.pair[i])
-    if binance_futures_api.get_position_amount(i) > 0:
+    print(api_binance_futures.pair[i])
+    if api_binance_futures.get_position_amount(i) > 0:
         if EMA.GOING_DOWN(current_ema_low, current_ema_high):
-            if live_trade: binance_futures_api.close_long(i)
+            if live_trade: api_binance_futures.close_long(i)
             print("ACTION           :   💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
-    elif binance_futures_api.get_position_amount(i) < 0:
+    elif api_binance_futures.get_position_amount(i) < 0:
         if EMA.GOING_UP(current_ema_low, current_ema_high):
-            if live_trade: binance_futures_api.close_short(i)
+            if live_trade: api_binance_futures.close_short(i)
             print("ACTION           :   💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
 
     else:
         if EMA.GOING_UP(current_ema_low, current_ema_high):
-            if live_trade: binance_futures_api.open_long_position(i)
+            if live_trade: api_binance_futures.open_long_position(i)
             print(colored("ACTION           :   🚀 GO_LONG 🚀", "green"))
 
         elif EMA.GOING_DOWN(current_ema_low, current_ema_high):
-            if live_trade: binance_futures_api.open_short_position(i)
+            if live_trade: api_binance_futures.open_short_position(i)
             print(colored("ACTION           :   💥 GO_SHORT 💥", "red"))
 
         else: print("ACTION           :   🐺 WAIT 🐺")

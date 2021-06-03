@@ -1,12 +1,16 @@
-import bybit_api
+import api_bybit
 
-response = bybit_api.position_information(0)
+response = api_bybit.position_information(0)
 
-# bybit_api.open_long_position(0)
-# bybit_api.open_short_position(0)
-# bybit_api.close_long(0, response)
-# bybit_api.close_short(0, response)
+# api_bybit.open_long_position(0)
+# api_bybit.open_short_position(0)
 
-test = bybit_api.open_long_position(0)
+# api_bybit.close_long(0)
+# api_bybit.close_short(0)
 
-print(test)
+# test = api_bybit.open_short_position(0)
+# print(test)
+
+for r in response:
+    print(r)
+# print(api_bybit.position_info(response))
