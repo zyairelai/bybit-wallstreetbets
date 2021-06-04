@@ -12,11 +12,14 @@ for i in range(len(config_bybit.coin)):
 def get_timestamp():
     return int(time.time()) - 2592000
 
-def get_klines(i):
+def KLINE_INTERVAL_1HOUR(i):
+    return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=50, **{'from':get_timestamp()}).result()[0].get('result')    
+
+def KLINE_INTERVAL_1DAY(i):
     return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D", limit=50, **{'from':get_timestamp()}).result()[0].get('result')    
 
 def position_information(i):
-    return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')
+    return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')[0]#.get('symbol')   
 
 def LONG_SIDE(response):
     if response[0].get('size') > 0: return "LONGING"

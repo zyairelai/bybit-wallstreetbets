@@ -1,16 +1,10 @@
-import api_bybit
+import bybit, os, api_bybit
 
-response = api_bybit.position_information(0)
+api_key    = os.environ.get('api_bybit')
+api_secret = os.environ.get('BYBIT_SECRET')
+client = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 
-# api_bybit.open_long_position(0)
-# api_bybit.open_short_position(0)
+# wjuuu = api_bybit.position_information(0)
 
-# api_bybit.close_long(0)
-# api_bybit.close_short(0)
+print(client.LinearPositions.LinearPositions_myPosition(symbol="BTCUSDT", timestamp="1622784046").result())
 
-# test = api_bybit.open_short_position(0)
-# print(test)
-
-for r in response:
-    print(r)
-# print(api_bybit.position_info(response))

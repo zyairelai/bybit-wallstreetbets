@@ -1,4 +1,4 @@
-live_trade = False
+live_trade = True
 enable_scheduler = False
 
 coin     = ["BTC"]
