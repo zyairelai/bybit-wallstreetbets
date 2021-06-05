@@ -1,17 +1,17 @@
 import os
 import time
-import config_binance
+import config
 from binance.client import Client
 
 # Get environment variables
 api_key     = os.environ.get('BINANCE_KEY')
 api_secret  = os.environ.get('BINANCE_SECRET')
 client      = Client(api_key, api_secret)
-live_trade  = config_binance.live_trade
+live_trade  = config.live_trade
 
 pair = []
-for i in range(len(config_binance.coin)):
-    pair.append(config_binance.coin[i] + "USDT")
+for i in range(len(config.coin)):
+    pair.append(config.coin[i] + "USDT")
 
 query = 20
 def get_timestamp(): return int(time.time() * 1000)
@@ -40,11 +40,11 @@ def change_margin_to_CROSSED(i):
 
 def open_long_position(i):
     if live_trade:
-        client.futures_create_order(symbol=pair[i], side="BUY", type="MARKET", quantity=config_binance.quantity[i], timestamp=get_timestamp())
+        client.futures_create_order(symbol=pair[i], side="BUY", type="MARKET", quantity=config.quantity[i], timestamp=get_timestamp())
 
 def open_short_position(i):
     if live_trade:
-        client.futures_create_order(symbol=pair[i], side="SELL", type="MARKET", quantity=config_binance.quantity[i], timestamp=get_timestamp())
+        client.futures_create_order(symbol=pair[i], side="SELL", type="MARKET", quantity=config.quantity[i], timestamp=get_timestamp())
 
 def close_long(i, response):
     if live_trade:

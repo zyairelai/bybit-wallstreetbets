@@ -1,14 +1,14 @@
-import os, time, bybit, config_bybit
+import os, time, bybit, config
 
 # Get environment variables
 api_key    = os.environ.get('BYBIT_KEY')
 api_secret = os.environ.get('BYBIT_SECRET')
 client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
-live_trade = config_bybit.live_trade
+live_trade = config.live_trade
 
 pair = []
-for i in range(len(config_bybit.coin)):
-    pair.append(config_bybit.coin[i] + "USDT")
+for i in range(len(config.coin)):
+    pair.append(config.coin[i] + "USDT")
 
 query = 20
 def get_timestamp(recent): return int(time.time()) - recent
@@ -48,12 +48,12 @@ def disable_auto_add_margin(i):
 
 def open_long_position(i):
     if live_trade:
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config_bybit.quantity[i], order_type="Market",
+        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Market",
         time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
 
 def open_short_position(i):
     if live_trade:
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config_bybit.quantity[i], order_type="Market",
+        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Market",
         time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
 
 def close_long(i, response):
