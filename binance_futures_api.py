@@ -17,7 +17,7 @@ query = 20
 def get_timestamp(): return int(time.time() * 1000)
 def KLINE_INTERVAL_1HOUR(i): return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
 def KLINE_INTERVAL_1DAY(i) : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1DAY)
-def position_information(i): return client.futures_position_information(symbol=pair[i], timestamp=get_timestamp())
+def position_information(i): return client.futures_position_information(symbol=pair[i], timestamp=get_timestamp())[0]
 def get_position_amount(i) : return float(position_information(i)[0].get('positionAmt'))
 
 def closing_price_list(klines):
@@ -48,10 +48,10 @@ def open_short_position(i):
 
 def close_long(i, response):
     if live_trade:
-        positionAmt = abs(float(response[0].get('positionAmt')))
+        positionAmt = abs(float(response.get('positionAmt')))
         client.futures_create_order(symbol=pair[i], side="SELL", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
 
 def close_short(i, response):
     if live_trade:
-        positionAmt = abs(float(response[0].get('positionAmt')))
+        positionAmt = abs(float(response.get('positionAmt')))
         client.futures_create_order(symbol=pair[i], side="BUY", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())

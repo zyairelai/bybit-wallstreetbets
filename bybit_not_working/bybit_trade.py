@@ -1,14 +1,11 @@
-import EMA
-import config
 import bybit_api
+import config, EMA
 from datetime import datetime
 from termcolor import colored
-HOUR_OR_DAY = "HOUR"
 
 def lets_make_some_money(i):
     print(bybit_api.pair[i])
-    if   HOUR_OR_DAY == "HOUR": klines = bybit_api.KLINE_INTERVAL_1HOUR(i)
-    elif HOUR_OR_DAY == "DAY" : klines = bybit_api.KLINE_INTERVAL_1DAY(i)
+    klines   = bybit_api.KLINE_INTERVAL_1DAY(i)
     response = bybit_api.position_information(i)
     dataset  = bybit_api.closing_price_list(klines)
     EMA_low  = EMA.compute(3, dataset)
@@ -45,3 +42,30 @@ def lets_make_some_money(i):
         else: print("🐺 WAIT 🐺")
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
+
+import requests, socket, urllib3
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+if config.live_trade:
+    print(colored("LIVE TRADE IS ENABLED\n", "green"))
+else: print(colored("THIS IS BACKTESTING\n", "red"))
+
+def add_this_to_cron_job():
+    for i in range(len(config.coin)):lets_make_some_money(i)
+
+try:
+    if config.enable_scheduler:
+        scheduler = BlockingScheduler()
+        scheduler.add_job(add_this_to_cron_job, 'cron', second='0')
+        scheduler.start()
+    else: add_this_to_cron_job()
+
+except (socket.timeout,
+        urllib3.exceptions.ProtocolError,
+        urllib3.exceptions.ReadTimeoutError,
+        requests.exceptions.ConnectionError,
+        requests.exceptions.ConnectTimeout,
+        requests.exceptions.ReadTimeout,
+        ConnectionResetError, KeyError, OSError) as e: print(e)
+
+except KeyboardInterrupt: print("\n\nAborted.\n")

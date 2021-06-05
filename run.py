@@ -1,25 +1,62 @@
-import config
-import longterm
-import requests
-import socket
-import urllib3
+import config, EMA
+import binance_futures_api
+from datetime import datetime
 from termcolor import colored
+
+def lets_make_some_money(i):
+    print(binance_futures_api.pair[i])
+    klines   = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
+    response = binance_futures_api.position_information(i)
+    dataset  = binance_futures_api.closing_price_list(klines)
+    EMA_low  = EMA.compute(3, dataset)
+    EMA_high = EMA.compute(7, dataset)
+
+    leverage = config.leverage
+    if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
+    if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
+
+    if binance_futures_api.get_position_amount(i) > 0: # LONGING
+        if EMA.GOING_DOWN(EMA_low):
+            binance_futures_api.close_long(i)
+            print("💰 CLOSE_LONG 💰")
+        else: print(colored("HOLDING_LONG", "green"))
+
+    elif binance_futures_api.get_position_amount(i) < 0: # SHORTING
+        if EMA.GOING_UP(EMA_low):
+            binance_futures_api.close_short(i)
+            print("💰 CLOSE_SHORT 💰")
+        else: print(colored("HOLDING_SHORT", "red"))
+
+    else:
+        if EMA.UP_TREND(EMA_low, EMA_high) and EMA.GOING_UP(EMA_low) and EMA.GOING_UP(EMA_high):
+            binance_futures_api.open_long_position(i)
+            print(colored("🚀 GO_LONG 🚀", "green"))
+
+        elif EMA.DOWN_TREND(EMA_low, EMA_high) and EMA.GOING_DOWN(EMA_low) and EMA.GOING_DOWN(EMA_high):
+            binance_futures_api.open_short_position(i)
+            print(colored("💥 GO_SHORT 💥", "red"))
+
+        else: print("🐺 WAIT 🐺")
+
+    print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
+
+import requests, socket, urllib3
 from binance.exceptions import BinanceAPIException
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-if config.live_trade: print(colored("LIVE TRADE IS ENABLED\n", "green"))
+if config.live_trade:
+    print(colored("LIVE TRADE IS ENABLED\n", "green"))
 else: print(colored("THIS IS BACKTESTING\n", "red"))
 
-def long_term_low_leverage():
-    for i in range(len(config.coin)):
-        longterm.lets_make_some_money(i)
+def add_this_to_cron_job():
+    for i in range(len(config.coin)): lets_make_some_money(i)
 
 try:
     if config.enable_scheduler:
         scheduler = BlockingScheduler()
-        scheduler.add_job(long_term_low_leverage, 'cron', second='0')
+        scheduler.add_job(add_this_to_cron_job, 'cron', second='0')
         scheduler.start()
-    else: long_term_low_leverage()
+    else: add_this_to_cron_job()
 
 except (socket.timeout,
         BinanceAPIException,

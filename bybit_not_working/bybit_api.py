@@ -1,4 +1,7 @@
-import os, time, bybit, config
+import os
+import time
+import bybit
+import config
 
 # Get environment variables
 api_key    = os.environ.get('BYBIT_KEY')
