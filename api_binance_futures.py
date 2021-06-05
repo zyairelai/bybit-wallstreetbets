@@ -4,8 +4,8 @@ import config_binance
 from binance.client import Client
 
 # Get environment variables
-api_key     = os.environ.get('API_KEY')
-api_secret  = os.environ.get('API_SECRET')
+api_key     = os.environ.get('BINANCE_KEY')
+api_secret  = os.environ.get('BINANCE_SECRET')
 client      = Client(api_key, api_secret)
 live_trade  = config_binance.live_trade
 

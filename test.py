@@ -1,5 +1,9 @@
-import EMA, api_bybit, api_binance_futures
+import os, bybit, EMA, api_bybit, api_binance_futures
 from termcolor import colored
+
+api_key    = os.environ.get('BYBIT_API')
+api_secret = os.environ.get('BYBIT_SECRET')
+client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 
 i = 0
 klines = api_binance_futures.KLINE_INTERVAL_1HOUR(i)

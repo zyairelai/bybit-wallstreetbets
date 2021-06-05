@@ -1,7 +1,7 @@
 import os, time, bybit, config_bybit
 
 # Get environment variables
-api_key    = os.environ.get('BYBIT_API')
+api_key    = os.environ.get('BYBIT_KEY')
 api_secret = os.environ.get('BYBIT_SECRET')
 client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 live_trade = config_bybit.live_trade
