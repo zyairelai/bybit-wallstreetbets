@@ -2,10 +2,6 @@ import sys
 import requests
 import socket
 import urllib3
-import config_bybit
-import config_binance
-import trade_bybit
-import trade_binance
 from termcolor import colored
 from binance.exceptions import BinanceAPIException
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -14,6 +10,8 @@ bybit   = sys.argv[-1].upper() == "BYBIT"
 binance = sys.argv[-1].upper() == "BINANCE"
 
 def run_binance():
+    import config_binance
+    import trade_binance
     if config_binance.live_trade: print(colored("LIVE TRADE IS ENABLED\n", "green"))
     else: print(colored("THIS IS BACKTESTING\n", "red"))
 
@@ -29,6 +27,8 @@ def run_binance():
     else: making_money_from_binance()
 
 def run_bybit():
+    import config_bybit
+    import trade_bybit
     if config_bybit.live_trade: print(colored("LIVE TRADE IS ENABLED\n", "green"))
     else: print(colored("THIS IS BACKTESTING\n", "red"))
 
