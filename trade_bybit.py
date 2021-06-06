@@ -30,13 +30,13 @@ def lets_make_some_money(i):
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
 
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
-        if EMA.UP_TREND(EMA_low, EMA_high) and EMA.GOING_UP(EMA_low) and EMA.GOING_UP(EMA_high):
+        if EMA.ALL_GOING_UP(EMA_low, EMA_high):
             bybit_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("🐺 WAIT 🐺")
 
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
-        if EMA.DOWN_TREND(EMA_low, EMA_high) and EMA.GOING_DOWN(EMA_low) and EMA.GOING_DOWN(EMA_high):
+        if EMA.ALL_GOING_DOWN(EMA_low, EMA_high):
             bybit_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("🐺 WAIT 🐺")
@@ -51,12 +51,12 @@ if config.live_trade:
 else: print(colored("THIS IS BACKTESTING\n", "red"))
 
 def add_this_to_cron_job():
-    for i in range(len(config.coin)):lets_make_some_money(i)
+    for i in range(len(config.coin)): lets_make_some_money(i)
 
 try:
     if config.enable_scheduler:
         scheduler = BlockingScheduler()
-        scheduler.add_job(add_this_to_cron_job, 'cron', second='0')
+        scheduler.add_job(add_this_to_cron_job, 'cron', minute='0,30')
         scheduler.start()
     else: add_this_to_cron_job()
 

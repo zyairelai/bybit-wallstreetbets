@@ -1,6 +1,11 @@
 # long-term-low-leverage
 
-# Command to RUN
+### Command to on Binance
 ```
-python3 run.py
+python3 trade_binance.py
+```
+
+### Command to on Binance
+```
+python3 trade_bybit.py
 ```
