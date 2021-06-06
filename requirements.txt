@@ -1,5 +1,6 @@
 APScheduler==3.6.3
-cryptography==3.3.2 
+Bybit==0.2.12
+cryptography==3.3.2
 pandas==1.2.4
 python-binance==0.7.5
 termcolor==1.1.0

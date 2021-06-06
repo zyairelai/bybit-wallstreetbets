@@ -8,13 +8,25 @@ def current(EMA_list) : return EMA_list[-1]
 def previous(EMA_list): return EMA_list[-2]
 
 def UP_TREND(low, high):
-    if current(low) > current(high): return True
+    if current(low) > current(high):
+        return True
 
 def DOWN_TREND(low, high):
-    if current(high) > current(low): return True
+    if current(high) > current(low):
+        return True
 
 def GOING_UP(EMA_list):
-    if current(EMA_list) > previous(EMA_list): return True
+    if current(EMA_list) > previous(EMA_list):
+        return True
 
 def GOING_DOWN(EMA_list):
-    if current(EMA_list) < previous(EMA_list): return True
+    if current(EMA_list) < previous(EMA_list):
+        return True
+
+def BOTH_GOING_UP(low, high):
+    if GOING_UP(low) and GOING_UP(high):
+        return True
+
+def BOTH_GOING_DOWN(low, high):
+    if GOING_DOWN(low) and GOING_DOWN(high):
+        return True

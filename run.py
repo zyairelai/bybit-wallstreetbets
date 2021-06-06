@@ -16,23 +16,23 @@ def lets_make_some_money(i):
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
     if binance_futures_api.get_position_amount(i) > 0: # LONGING
-        if EMA.GOING_DOWN(EMA_low):
-            binance_futures_api.close_long(i)
+        if EMA.BOTH_GOING_UP(EMA_low, EMA_high):
+            binance_futures_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     elif binance_futures_api.get_position_amount(i) < 0: # SHORTING
-        if EMA.GOING_UP(EMA_low):
-            binance_futures_api.close_short(i)
+        if EMA.BOTH_GOING_DOWN(EMA_low, EMA_high):
+            binance_futures_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
 
     else:
-        if EMA.UP_TREND(EMA_low, EMA_high) and EMA.GOING_UP(EMA_low) and EMA.GOING_UP(EMA_high):
+        if EMA.UP_TREND(EMA_low, EMA_high) and EMA.BOTH_GOING_UP(EMA_low, EMA_high):
             binance_futures_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
 
-        elif EMA.DOWN_TREND(EMA_low, EMA_high) and EMA.GOING_DOWN(EMA_low) and EMA.GOING_DOWN(EMA_high):
+        elif EMA.DOWN_TREND(EMA_low, EMA_high) and EMA.BOTH_GOING_DOWN(EMA_low, EMA_high):
             binance_futures_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
 

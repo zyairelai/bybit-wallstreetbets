@@ -1,5 +1,5 @@
-live_trade = True
-enable_scheduler = True
+live_trade = False
+enable_scheduler = False
 
 coin     = ["BTC"]
 quantity = [0.001]
