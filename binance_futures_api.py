@@ -15,9 +15,10 @@ for i in range(len(config.coin)):
 
 query = 20
 def get_timestamp(): return int(time.time() * 1000)
+def KLINE_INTERVAL_5MINUTE(i) : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_5MINUTE)
 def KLINE_INTERVAL_15MINUTE(i): return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_15MINUTE)
-def KLINE_INTERVAL_1HOUR(i): return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
-def KLINE_INTERVAL_1DAY(i) : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1DAY)
+def KLINE_INTERVAL_1HOUR(i)   : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
+def KLINE_INTERVAL_1DAY(i)    : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1DAY)
 def account_trades(i, timestamp) : return client.futures_account_trades(symbol=pair[i], timestamp=get_timestamp(), startTime=timestamp)
 def position_information(i): return client.futures_position_information(symbol=pair[i], timestamp=get_timestamp())[0]
 def get_position_amount(i) : return float(position_information(i).get('positionAmt'))

@@ -18,13 +18,13 @@ def lets_make_some_money(i):
     if not response[1].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
-        if EMA.GOING_DOWN(EMA_low):
+        if EMA.GOING_DOWN(EMA_high):
             bybit_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
-        if EMA.GOING_UP(EMA_low):
+        if EMA.GOING_UP(EMA_high):
             bybit_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))

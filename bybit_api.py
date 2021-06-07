@@ -15,8 +15,8 @@ for i in range(len(config.coin)):
 
 query = 20
 def get_timestamp(recent): return int(time.time()) - recent
-def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(10*60*60)}).result()[0].get('result')    
-def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(10*24*60*60)}).result()[0].get('result')    
+def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(query*60*60)}).result()[0].get('result')    
+def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(query*24*60*60)}).result()[0].get('result')    
 def position_information(i): return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
 
 def LONG_SIDE(response):
