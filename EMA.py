@@ -30,3 +30,9 @@ def ALL_GOING_UP(low, high):
 
 def ALL_GOING_DOWN(low, high):
     if DOWN_TREND(low, high) and BOTH_GOING_DOWN(low, high): return True
+
+def DELTA_UP(low, medium, high):
+    if current(low) > current(medium) and current(medium) > current(high): return True
+
+def DELTA_DOWN(low, medium, high):
+    if current(high) > current(medium) and current(medium) > current(low): return True
