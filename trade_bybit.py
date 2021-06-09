@@ -11,7 +11,6 @@ def lets_make_some_money(i):
     EMA_low  = EMA.compute(5, dataset)
     EMA_mid  = EMA.compute(8, dataset)
     EMA_high = EMA.compute(13, dataset)
-    current_close = dataset[-1]
 
     leverage = config.leverage
     if response[0].get('leverage') != leverage: bybit_api.change_leverage(i, leverage)
@@ -20,30 +19,58 @@ def lets_make_some_money(i):
     if not response[1].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
-        if EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or current_close > EMA.current(EMA_low):
+        if EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
             bybit_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
-        if EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or current_close < EMA.current(EMA_low):
+        if EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
             bybit_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
 
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
-        if EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or current_close > EMA.current(EMA_low):
+        if GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
             bybit_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("🐺 WAIT 🐺")
 
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
-        if EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or current_close < EMA.current(EMA_low):
+        if GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
             bybit_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("🐺 WAIT 🐺")
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
+
+# ==========================================================================================================================================================================
+#                                                    ENTRY CONDITIONS
+# ==========================================================================================================================================================================
+
+def GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+    if (EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or bybit_api.current_close(klines) > EMA.current(EMA_mid)) and \
+        bybit_api.current_close(klines) > EMA.current(EMA_low) and \
+        bybit_api.candle_color(klines) == "GREEN": return True
+
+def GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+    if (EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or bybit_api.current_close(klines) < EMA.current(EMA_mid)) and \
+        bybit_api.current_close(klines) < EMA.current(EMA_low) and \
+        bybit_api.candle_color(klines) == "RED": return True
+
+def EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
+    if  bybit_api.current_close(klines) < EMA.current(EMA_high) and \
+        bybit_api.current_close(klines) < EMA.current(EMA_low) and \
+        bybit_api.candle_color(klines) == "RED": return True
+
+def EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
+    if  bybit_api.current_close(klines) > EMA.current(EMA_high) and \
+        bybit_api.current_close(klines) > EMA.current(EMA_low) and \
+        bybit_api.candle_color(klines) == "GREEN": return True
+
+# ==========================================================================================================================================================================
+#                                                    DEPLOY THE BOT
+# ==========================================================================================================================================================================
 
 import requests, socket, urllib3
 from apscheduler.schedulers.blocking import BlockingScheduler

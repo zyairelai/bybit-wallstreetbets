@@ -11,36 +11,63 @@ def lets_make_some_money(i):
     EMA_low  = EMA.compute(5, dataset)
     EMA_mid  = EMA.compute(8, dataset)
     EMA_high = EMA.compute(13, dataset)
-    current_close = dataset[-1]
 
     leverage = config.leverage
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
     if binance_futures_api.get_position_amount(i) > 0: # LONGING
-        if EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or current_close < EMA.current(EMA_low):
+        if EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
             binance_futures_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     elif binance_futures_api.get_position_amount(i) < 0: # SHORTING
-        if EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or current_close > EMA.current(EMA_low):
+        if EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
             binance_futures_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
 
     else:
-        if EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or current_close > EMA.current(EMA_low):
+        if GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
             binance_futures_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
 
-        elif EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or current_close < EMA.current(EMA_low):
+        elif GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
             binance_futures_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
 
         else: print("🐺 WAIT 🐺")
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
+
+# ==========================================================================================================================================================================
+#                                                    ENTRY CONDITIONS
+# ==========================================================================================================================================================================
+
+def GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+    if (EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or binance_futures_api.current_close(klines) > EMA.current(EMA_mid)) and \
+        binance_futures_api.current_close(klines) > EMA.current(EMA_low) and \
+        binance_futures_api.candle_color(klines) == "GREEN": return True
+
+def GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+    if (EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or binance_futures_api.current_close(klines) < EMA.current(EMA_mid)) and \
+        binance_futures_api.current_close(klines) < EMA.current(EMA_low) and \
+        binance_futures_api.candle_color(klines) == "RED": return True
+
+def EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
+    if  binance_futures_api.current_close(klines) < EMA.current(EMA_high) and \
+        binance_futures_api.current_close(klines) < EMA.current(EMA_low) and \
+        binance_futures_api.candle_color(klines) == "RED": return True
+
+def EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
+    if  binance_futures_api.current_close(klines) > EMA.current(EMA_high) and \
+        binance_futures_api.current_close(klines) > EMA.current(EMA_low) and \
+        binance_futures_api.candle_color(klines) == "GREEN": return True
+
+# ==========================================================================================================================================================================
+#                                                    DEPLOY THE BOT
+# ==========================================================================================================================================================================
 
 import requests, socket, urllib3
 from binance.exceptions import BinanceAPIException

@@ -70,3 +70,28 @@ def close_short(i, response):
         positionAmt = response[1].get('size')
         return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Market",
         time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
+
+def current_open(klines) : return float(klines[-1].get('open'))
+def current_close(klines): return float(klines[-1].get('close'))
+def current_high(klines) : return float(klines[-1].get('high'))
+def current_low(klines)  : return float(klines[-1].get('low'))
+def candle_body(klines)  : return abs(current_open(klines) - current_close(klines))
+
+def candle_color(klines):
+    if current_close(klines) > current_open(klines): return "GREEN"
+    elif current_close(klines) < current_open(klines): return "RED"
+    else: return "INDECISIVE"
+
+def upper_wick(klines):
+    if candle_color(klines) == "GREEN": return current_high(klines) - current_close(klines)
+    elif candle_color(klines) == "RED": return current_high(klines) - current_open(klines)
+    else: return 0
+
+def lower_wick(klines):
+    if candle_color(klines) == "GREEN": return current_open(klines)  - current_low(klines)
+    elif candle_color(klines) == "RED": return current_close(klines) - current_low(klines)
+    else: return 0
+
+def strong_candle(klines):
+    if candle_color(klines) == "GREEN" and candle_body(klines) > lower_wick(klines): return True
+    elif candle_color(klines) == "RED" and candle_body(klines) > upper_wick(klines): return True

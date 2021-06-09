@@ -56,3 +56,28 @@ def close_short(i, response):
     if live_trade:
         positionAmt = abs(float(response.get('positionAmt')))
         client.futures_create_order(symbol=pair[i], side="BUY", type="MARKET", quantity=positionAmt, timestamp=get_timestamp())
+
+def current_open(klines)  : return float(klines[-1][1])
+def current_high(klines)  : return float(klines[-1][2])
+def current_low(klines)   : return float(klines[-1][3])
+def current_close(klines) : return float(klines[-1][4])
+def candle_body(klines)   : return abs(current_open(klines) - current_close(klines))
+
+def candle_color(klines):
+    if current_close(klines) > current_open(klines): return "GREEN"
+    elif current_close(klines) < current_open(klines): return "RED"
+    else: return "INDECISIVE"
+
+def upper_wick(klines):
+    if candle_color(klines) == "GREEN": return current_high(klines) - current_close(klines)
+    elif candle_color(klines) == "RED": return current_high(klines) - current_open(klines)
+    else: return 0
+
+def lower_wick(klines):
+    if candle_color(klines) == "GREEN": return current_open(klines)  - current_low(klines)
+    elif candle_color(klines) == "RED": return current_close(klines) - current_low(klines)
+    else: return 0
+
+def strong_candle(klines):
+    if candle_color(klines) == "GREEN" and candle_body(klines) > lower_wick(klines): return True
+    elif candle_color(klines) == "RED" and candle_body(klines) > upper_wick(klines): return True

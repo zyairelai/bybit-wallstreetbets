@@ -4,8 +4,8 @@ def compute(digit, dataset):
     ema = df.ewm(span=digit).mean()
     return ema[0].values.tolist()
 
-def current(EMA_list) : return EMA_list[-1]
-def previous(EMA_list): return EMA_list[-2]
+def current(EMA_list) : return float(EMA_list[-1])
+def previous(EMA_list): return float(EMA_list[-2])
 
 def UPWARD_MOVEMENT(EMA_list):
     if current(EMA_list) > previous(EMA_list): return True
