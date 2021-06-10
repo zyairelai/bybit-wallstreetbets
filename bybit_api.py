@@ -95,3 +95,6 @@ def lower_wick(klines):
 def strong_candle(klines):
     if candle_color(klines) == "GREEN" and candle_body(klines) > lower_wick(klines): return True
     elif candle_color(klines) == "RED" and candle_body(klines) > upper_wick(klines): return True
+
+def indecisive_candle(klines):
+    if upper_wick(klines) > candle_body(klines) and lower_wick(klines) > candle_body(klines): return True

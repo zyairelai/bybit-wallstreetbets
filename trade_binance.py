@@ -8,32 +8,33 @@ def lets_make_some_money(i):
     klines   = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
     response = binance_futures_api.position_information(i)
     dataset  = binance_futures_api.closing_price_list(klines)
-    EMA_low  = EMA.compute(5, dataset)
-    EMA_mid  = EMA.compute(8, dataset)
-    EMA_high = EMA.compute(13, dataset)
+
+    low  = EMA.compute(5, dataset)
+    mid  = EMA.compute(8, dataset)
+    high = EMA.compute(13, dataset)
 
     leverage = config.leverage
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
     if binance_futures_api.get_position_amount(i) > 0: # LONGING
-        if EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
+        if EXIT_LONG_CONDITION(klines, low):
             binance_futures_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     elif binance_futures_api.get_position_amount(i) < 0: # SHORTING
-        if EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
+        if EXIT_SHORT_CONDITION(klines, low):
             binance_futures_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
 
     else:
-        if GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+        if GO_LONG_CONDITION(klines, low, mid, high):
             binance_futures_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
 
-        elif GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
+        elif GO_SHORT_CONDITION(klines, low, mid, high):
             binance_futures_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
 
@@ -45,24 +46,24 @@ def lets_make_some_money(i):
 #                                                    ENTRY CONDITIONS
 # ==========================================================================================================================================================================
 
-def GO_LONG_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
-    if (EMA.DELTA_UP(EMA_low, EMA_mid, EMA_high) or binance_futures_api.current_close(klines) > EMA.current(EMA_mid)) and \
-        binance_futures_api.current_close(klines) > EMA.current(EMA_low) and \
-        binance_futures_api.candle_color(klines) == "GREEN": return True
+def GO_LONG_CONDITION(klines, low, mid, high):
+    if EMA.DELTA_UP(low, mid, high) and \
+        binance_futures_api.current_close(klines) > EMA.current(low) and \
+        binance_futures_api.candle_color(klines) == "GREEN" and \
+        not binance_futures_api.indecisive_candle(klines): return True
 
-def GO_SHORT_CONDITION(klines, EMA_low, EMA_mid, EMA_high):
-    if (EMA.DELTA_DOWN(EMA_low, EMA_mid, EMA_high) or binance_futures_api.current_close(klines) < EMA.current(EMA_mid)) and \
-        binance_futures_api.current_close(klines) < EMA.current(EMA_low) and \
+def GO_SHORT_CONDITION(klines, low, mid, high):
+    if EMA.DELTA_DOWN(low, mid, high) and \
+        binance_futures_api.current_close(klines) < EMA.current(low) and \
+        binance_futures_api.candle_color(klines) == "RED" and \
+        not binance_futures_api.indecisive_candle(klines): return True
+
+def EXIT_LONG_CONDITION(klines, low):
+    if  binance_futures_api.current_close(klines) < EMA.current(low) and \
         binance_futures_api.candle_color(klines) == "RED": return True
 
-def EXIT_LONG_CONDITION(klines, EMA_low, EMA_high):
-    if  binance_futures_api.current_close(klines) < EMA.current(EMA_high) and \
-        binance_futures_api.current_close(klines) < EMA.current(EMA_low) and \
-        binance_futures_api.candle_color(klines) == "RED": return True
-
-def EXIT_SHORT_CONDITION(klines, EMA_low, EMA_high):
-    if  binance_futures_api.current_close(klines) > EMA.current(EMA_high) and \
-        binance_futures_api.current_close(klines) > EMA.current(EMA_low) and \
+def EXIT_SHORT_CONDITION(klines, low):
+    if  binance_futures_api.current_close(klines) > EMA.current(low) and \
         binance_futures_api.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================
