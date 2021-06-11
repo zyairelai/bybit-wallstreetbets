@@ -5,7 +5,7 @@ from termcolor import colored
 
 def lets_make_some_money(i):
     print(binance_futures_api.pair[i])
-    klines   = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
+    klines   = binance_futures_api.KLINE_INTERVAL_15MINUTE(i)
     response = binance_futures_api.position_information(i)
     dataset  = binance_futures_api.closing_price_list(klines)
 
@@ -84,7 +84,7 @@ def add_this_to_cron_job():
 try:
     if config.enable_scheduler:
         scheduler = BlockingScheduler()
-        scheduler.add_job(add_this_to_cron_job, 'cron', second='0')
+        scheduler.add_job(add_this_to_cron_job, 'cron', second='0,30')
         scheduler.start()
     else: add_this_to_cron_job()
 
