@@ -5,7 +5,7 @@ from termcolor import colored
 
 def lets_make_some_money(i):
     print(binance_futures_api.pair[i])
-    klines   = binance_futures_api.KLINE_INTERVAL_15MINUTE(i)
+    klines   = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
     response = binance_futures_api.position_information(i)
     dataset  = binance_futures_api.closing_price_list(klines)
 
@@ -18,13 +18,13 @@ def lets_make_some_money(i):
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 
     if binance_futures_api.get_position_amount(i) > 0: # LONGING
-        if EXIT_LONG_CONDITION(klines, low):
+        if EXIT_LONG_CONDITION(klines, low, mid, high):
             binance_futures_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     elif binance_futures_api.get_position_amount(i) < 0: # SHORTING
-        if EXIT_SHORT_CONDITION(klines, low):
+        if EXIT_SHORT_CONDITION(klines, low, mid, high):
             binance_futures_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
@@ -47,23 +47,21 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_UP(low, mid, high) and \
-        binance_futures_api.current_close(klines) > EMA.current(low) and \
+    if not binance_futures_api.indecisive_candle(klines) and \
         binance_futures_api.candle_color(klines) == "GREEN" and \
-        not binance_futures_api.indecisive_candle(klines): return True
+        binance_futures_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_DOWN(low, mid, high) and \
-        binance_futures_api.current_close(klines) < EMA.current(low) and \
+    if not binance_futures_api.indecisive_candle(klines) and \
         binance_futures_api.candle_color(klines) == "RED" and \
-        not binance_futures_api.indecisive_candle(klines): return True
+        binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
 
-def EXIT_LONG_CONDITION(klines, low):
-    if  binance_futures_api.current_close(klines) < EMA.current(low) and \
+def EXIT_LONG_CONDITION(klines, low, mid, high):
+    if  binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and \
         binance_futures_api.candle_color(klines) == "RED": return True
 
-def EXIT_SHORT_CONDITION(klines, low):
-    if  binance_futures_api.current_close(klines) > EMA.current(low) and \
+def EXIT_SHORT_CONDITION(klines, low, mid, high):
+    if  binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
         binance_futures_api.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================

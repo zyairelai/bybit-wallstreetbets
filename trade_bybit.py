@@ -20,13 +20,13 @@ def lets_make_some_money(i):
     if not response[1].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
-        if EXIT_LONG_CONDITION(klines, low):
+        if EXIT_LONG_CONDITION(klines, low, mid, high):
             bybit_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("ACTION           :   HOLDING_LONG", "green"))
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
-        if EXIT_SHORT_CONDITION(klines, low):
+        if EXIT_SHORT_CONDITION(klines, low, mid, high):
             bybit_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
@@ -50,24 +50,42 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_UP(low, mid, high) and \
-        bybit_api.current_close(klines) > EMA.current(low) and \
+    if not bybit_api.indecisive_candle(klines) and \
         bybit_api.candle_color(klines) == "GREEN" and \
-        not bybit_api.indecisive_candle(klines): return True
+        bybit_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_DOWN(low, mid, high) and \
-        bybit_api.current_close(klines) < EMA.current(low) and \
+    if not bybit_api.indecisive_candle(klines) and \
         bybit_api.candle_color(klines) == "RED" and \
-        not bybit_api.indecisive_candle(klines): return True
+        bybit_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
 
-def EXIT_LONG_CONDITION(klines, low):
-    if  bybit_api.current_close(klines) < EMA.current(low) and \
+def EXIT_LONG_CONDITION(klines, low, mid, high):
+    if  bybit_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and \
         bybit_api.candle_color(klines) == "RED": return True
 
-def EXIT_SHORT_CONDITION(klines, low):
-    if  bybit_api.current_close(klines) > EMA.current(low) and \
+def EXIT_SHORT_CONDITION(klines, low, mid, high):
+    if  bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
         bybit_api.candle_color(klines) == "GREEN": return True
+
+# def GO_LONG_CONDITION(klines, low, mid, high):
+#     if EMA.ABSOLUTE_UPTREND(low, mid, high) and \
+#         bybit_api.current_close(klines) > EMA.current(low) and \
+#         bybit_api.candle_color(klines) == "GREEN" and \
+#         not bybit_api.indecisive_candle(klines): return True
+
+# def GO_SHORT_CONDITION(klines, low, mid, high):
+#     if EMA.ABSOLUTE_DOWNTREND(low, mid, high) and \
+#         bybit_api.current_close(klines) < EMA.current(low) and \
+#         bybit_api.candle_color(klines) == "RED" and \
+#         not bybit_api.indecisive_candle(klines): return True
+
+# def EXIT_LONG_CONDITION(klines, low):
+#     if  bybit_api.current_close(klines) < EMA.current(low) and \
+#         bybit_api.candle_color(klines) == "RED": return True
+
+# def EXIT_SHORT_CONDITION(klines, low):
+#     if  bybit_api.current_close(klines) > EMA.current(low) and \
+#         bybit_api.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT
