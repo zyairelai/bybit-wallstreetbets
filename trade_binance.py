@@ -5,7 +5,7 @@ from termcolor import colored
 
 def lets_make_some_money(i):
     print(binance_futures_api.pair[i])
-    klines   = binance_futures_api.KLINE_INTERVAL_1HOUR(i)
+    klines   = binance_futures_api.KLINE_INTERVAL_4HOUR(i)
     response = binance_futures_api.position_information(i)
     dataset  = binance_futures_api.closing_price_list(klines)
 
@@ -47,12 +47,14 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if not binance_futures_api.indecisive_candle(klines) and \
+    if EMA.DELTA_UPWARD(low, mid, high) and \
+        binance_futures_api.strong_candle(klines) and \
         binance_futures_api.candle_color(klines) == "GREEN" and \
         binance_futures_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if not binance_futures_api.indecisive_candle(klines) and \
+    if EMA.DELTA_DOWNWARD(low, mid, high) and \
+        binance_futures_api.strong_candle(klines) and \
         binance_futures_api.candle_color(klines) == "RED" and \
         binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
 

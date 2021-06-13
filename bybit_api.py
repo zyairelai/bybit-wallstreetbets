@@ -76,6 +76,7 @@ def current_close(klines): return float(klines[-1].get('close'))
 def current_high(klines) : return float(klines[-1].get('high'))
 def current_low(klines)  : return float(klines[-1].get('low'))
 def candle_body(klines)  : return abs(current_open(klines) - current_close(klines))
+def candle_wick(klines)  : return current_high(klines) - current_low(klines) - candle_body(klines)
 
 def candle_color(klines):
     if current_close(klines) > current_open(klines): return "GREEN"
@@ -93,8 +94,4 @@ def lower_wick(klines):
     else: return 0
 
 def strong_candle(klines):
-    if candle_color(klines) == "GREEN" and candle_body(klines) > lower_wick(klines): return True
-    elif candle_color(klines) == "RED" and candle_body(klines) > upper_wick(klines): return True
-
-def indecisive_candle(klines):
-    if upper_wick(klines) > candle_body(klines) and lower_wick(klines) > candle_body(klines): return True
+    if candle_body(klines) > candle_wick(klines): return True

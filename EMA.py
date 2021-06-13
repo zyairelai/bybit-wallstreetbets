@@ -18,3 +18,15 @@ def MIDDLE(low, mid, high):
 def LOWEST(low, mid, high):
     current_lines = [current(low), current(mid), current(high)]
     return min(current_lines)
+
+def UPWARD_MOVEMENT(EMA_list):
+    if current(EMA_list) > previous(EMA_list): return True
+
+def DOWNWARD_MOVEMENT(EMA_list):
+    if current(EMA_list) < previous(EMA_list): return True
+
+def DELTA_UPWARD(low, mid, high):
+    if UPWARD_MOVEMENT(low) and UPWARD_MOVEMENT(mid) and UPWARD_MOVEMENT(high): return True
+
+def DELTA_DOWNWARD(low, mid, high):
+    if DOWNWARD_MOVEMENT(low) and DOWNWARD_MOVEMENT(mid) and DOWNWARD_MOVEMENT(high): return True

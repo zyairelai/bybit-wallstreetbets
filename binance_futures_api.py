@@ -2,6 +2,7 @@ import os
 import time
 import config
 from binance.client import Client
+def get_timestamp(): return int(time.time() * 1000)
 
 # Get environment variables
 api_key     = os.environ.get('BINANCE_KEY')
@@ -9,12 +10,18 @@ api_secret  = os.environ.get('BINANCE_SECRET')
 client      = Client(api_key, api_secret)
 live_trade  = config.live_trade
 
-pair = []
+pair, leverage, markPrice = [], [], []
 for i in range(len(config.coin)):
     pair.append(config.coin[i] + "USDT")
+    markPrice.append(float(client.futures_mark_price(symbol=pair[i], timestamp=get_timestamp()).get('markPrice')))
+    if   markPrice[i] < 1: leverage.append(5)
+    elif markPrice[i] < 10: leverage.append(10)
+    elif markPrice[i] < 100: leverage.append(15)
+    elif markPrice[i] < 1000: leverage.append(20)
+    elif markPrice[i] < 10000: leverage.append(25)
+    elif markPrice[i] < 100000: leverage.append(30)
 
 query = 20
-def get_timestamp(): return int(time.time() * 1000)
 def KLINE_INTERVAL_5MINUTE(i)    : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_5MINUTE)
 def KLINE_INTERVAL_15MINUTE(i)   : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_15MINUTE)
 def KLINE_INTERVAL_1HOUR(i)      : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
@@ -65,6 +72,7 @@ def current_high(klines)  : return float(klines[-1][2])
 def current_low(klines)   : return float(klines[-1][3])
 def current_close(klines) : return float(klines[-1][4])
 def candle_body(klines)   : return abs(current_open(klines) - current_close(klines))
+def candle_wick(klines)   : return current_high(klines) - current_low(klines) - candle_body(klines)
 
 def candle_color(klines):
     if current_close(klines) > current_open(klines): return "GREEN"
@@ -82,8 +90,4 @@ def lower_wick(klines):
     else: return 0
 
 def strong_candle(klines):
-    if candle_color(klines) == "GREEN" and candle_body(klines) > lower_wick(klines): return True
-    elif candle_color(klines) == "RED" and candle_body(klines) > upper_wick(klines): return True
-
-def indecisive_candle(klines):
-    if upper_wick(klines) > candle_body(klines) and lower_wick(klines) > candle_body(klines): return True
+    if candle_body(klines) > candle_wick(klines): return True

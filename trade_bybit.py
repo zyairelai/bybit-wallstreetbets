@@ -50,12 +50,14 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if not bybit_api.indecisive_candle(klines) and \
+    if EMA.DELTA_UPWARD(low, mid, high) and \
+        bybit_api.strong_candle(klines) and \
         bybit_api.candle_color(klines) == "GREEN" and \
         bybit_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if not bybit_api.indecisive_candle(klines) and \
+    if EMA.DELTA_DOWNWARD(low, mid, high) and \
+        bybit_api.strong_candle(klines) and \
         bybit_api.candle_color(klines) == "RED" and \
         bybit_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
 
