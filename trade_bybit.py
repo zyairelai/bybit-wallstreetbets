@@ -13,7 +13,7 @@ def lets_make_some_money(i):
     mid  = EMA.compute(8, dataset)
     high = EMA.compute(13, dataset)
 
-    leverage = config.leverage
+    leverage = config.leverage[i]
     if response[0].get('leverage') != leverage: bybit_api.change_leverage(i, leverage)
     if response[1].get('leverage') != leverage: bybit_api.change_leverage(i, leverage)
     if not response[0].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)

@@ -10,18 +10,9 @@ api_secret  = os.environ.get('BINANCE_SECRET')
 client      = Client(api_key, api_secret)
 live_trade  = config.live_trade
 
-pair, leverage, markPrice = [], [], []
-for i in range(len(config.coin)):
-    pair.append(config.coin[i] + "USDT")
-    markPrice.append(float(client.futures_mark_price(symbol=pair[i], timestamp=get_timestamp()).get('markPrice')))
-    if   markPrice[i] < 1: leverage.append(5)
-    elif markPrice[i] < 10: leverage.append(10)
-    elif markPrice[i] < 100: leverage.append(15)
-    elif markPrice[i] < 1000: leverage.append(20)
-    elif markPrice[i] < 10000: leverage.append(25)
-    elif markPrice[i] < 100000: leverage.append(30)
-
 query = 20
+pair = []
+for i in range(len(config.coin)) : pair.append(config.coin[i] + "USDT")
 def KLINE_INTERVAL_5MINUTE(i)    : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_5MINUTE)
 def KLINE_INTERVAL_15MINUTE(i)   : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_15MINUTE)
 def KLINE_INTERVAL_1HOUR(i)      : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_1HOUR)
