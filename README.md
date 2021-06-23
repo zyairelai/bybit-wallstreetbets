@@ -94,7 +94,7 @@ The settings can be configured in `config.py`.
 | `enable_scheduler`  |`True` to loop the code everytime when the minute hits 0 and 30, which means twice in one hour              |
 | `coin`              | You can put your coin list here                                                                            |
 | `quantity`          | Amount of the trade amount you want to trade                                                               |
-| `leverage`          | The recommended leverage is all listed in the `config.py`. For BTC it is 30x, other coins shall below 20x  |
+| `leverage`          | The recommended leverage is all listed in the `config.py`.                                                 |
 
 <a name="run"></a>
 ### 4. RUN
