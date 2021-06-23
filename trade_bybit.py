@@ -19,29 +19,29 @@ def lets_make_some_money(i):
     if not response[0].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
     if not response[1].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
 
-    if bybit_api.LONG_SIDE(response) == "LONGING":
-        if EXIT_LONG_CONDITION(klines, low, mid, high):
-            bybit_api.close_long(i, response)
-            print("💰 CLOSE_LONG 💰")
-        else: print(colored("ACTION           :   HOLDING_LONG", "green"))
-
-    if bybit_api.SHORT_SIDE(response) == "SHORTING":
-        if EXIT_SHORT_CONDITION(klines, low, mid, high):
-            bybit_api.close_short(i, response)
-            print("💰 CLOSE_SHORT 💰")
-        else: print(colored("ACTION           :   HOLDING_SHORT", "red"))
-
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
         if GO_LONG_CONDITION(klines, low, mid, high):
             bybit_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("LONG_SIDE : 🐺 WAIT 🐺")
 
+    if bybit_api.LONG_SIDE(response) == "LONGING":
+        if EXIT_LONG_CONDITION(klines, low, mid, high):
+            bybit_api.close_long(i, response)
+            print("💰 CLOSE_LONG 💰")
+        else: print(colored("HOLDING_LONG", "green"))
+
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
         if GO_SHORT_CONDITION(klines, low, mid, high):
             bybit_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("SHORT_SIDE : 🐺 WAIT 🐺")
+
+    if bybit_api.SHORT_SIDE(response) == "SHORTING":
+        if EXIT_SHORT_CONDITION(klines, low, mid, high):
+            bybit_api.close_short(i, response)
+            print("💰 CLOSE_SHORT 💰")
+        else: print(colored("HOLDING_SHORT", "red"))
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
