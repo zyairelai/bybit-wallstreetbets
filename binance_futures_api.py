@@ -2,7 +2,6 @@ import os
 import time
 import config
 from binance.client import Client
-def get_timestamp(): return int(time.time() * 1000)
 
 # Get environment variables
 api_key     = os.environ.get('BINANCE_KEY')
@@ -12,6 +11,7 @@ live_trade  = config.live_trade
 
 query = 20
 pair = []
+
 for i in range(len(config.coin)) : pair.append(config.coin[i] + "USDT")
 def KLINE_INTERVAL_5MINUTE(i)    : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_5MINUTE)
 def KLINE_INTERVAL_15MINUTE(i)   : return client.futures_klines(symbol=pair[i], limit=query, interval=Client.KLINE_INTERVAL_15MINUTE)
@@ -21,6 +21,9 @@ def KLINE_INTERVAL_1DAY(i)       : return client.futures_klines(symbol=pair[i], 
 def account_trades(i, timestamp) : return client.futures_account_trades(symbol=pair[i], timestamp=get_timestamp(), startTime=timestamp)
 def position_information(i)      : return client.futures_position_information(symbol=pair[i], timestamp=get_timestamp())[0]
 def get_position_amount(i)       : return float(position_information(i).get('positionAmt'))
+
+def get_timestamp():
+    return int(time.time() * 1000)
 
 def closing_price_list(klines):
     closing_price_list = []

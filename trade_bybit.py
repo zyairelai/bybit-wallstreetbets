@@ -69,26 +69,6 @@ def EXIT_SHORT_CONDITION(klines, low, mid, high):
     if  bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
         bybit_api.candle_color(klines) == "GREEN": return True
 
-# def GO_LONG_CONDITION(klines, low, mid, high):
-#     if EMA.ABSOLUTE_UPTREND(low, mid, high) and \
-#         bybit_api.current_close(klines) > EMA.current(low) and \
-#         bybit_api.candle_color(klines) == "GREEN" and \
-#         not bybit_api.indecisive_candle(klines): return True
-
-# def GO_SHORT_CONDITION(klines, low, mid, high):
-#     if EMA.ABSOLUTE_DOWNTREND(low, mid, high) and \
-#         bybit_api.current_close(klines) < EMA.current(low) and \
-#         bybit_api.candle_color(klines) == "RED" and \
-#         not bybit_api.indecisive_candle(klines): return True
-
-# def EXIT_LONG_CONDITION(klines, low):
-#     if  bybit_api.current_close(klines) < EMA.current(low) and \
-#         bybit_api.candle_color(klines) == "RED": return True
-
-# def EXIT_SHORT_CONDITION(klines, low):
-#     if  bybit_api.current_close(klines) > EMA.current(low) and \
-#         bybit_api.candle_color(klines) == "GREEN": return True
-
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT
 # ==========================================================================================================================================================================
