@@ -111,7 +111,7 @@ Let's make the magic happens!
 python3 trade_binance.py
 ```
 
-### Command to on Binance
+### Command to on Bybit
 ```
 python3 trade_bybit.py
 ```
