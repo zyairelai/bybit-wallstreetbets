@@ -1,9 +1,9 @@
 live_trade = False
 enable_scheduler = False
 
-coin     = ["BTC"]
-quantity = [0.001]
-leverage = [20]
+coin     = ["BTC", "ETH"]
+quantity = [0.001, 0.01]
+leverage = [30, 20]
 
 # Recommended Leverage
 # if   markPrice[i] < 1: leverage.append(5)
