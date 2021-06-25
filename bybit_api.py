@@ -9,14 +9,19 @@ api_secret = os.environ.get('BYBIT_SECRET')
 client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 live_trade = config.live_trade
 
-pair = []
+def get_timestamp(recent):
+    return int(time.time()) - recent
+
+def current_low(klines)  : return float(klines[-1].get('low'))
+
+pair, leverage = [], []
 for i in range(len(config.coin)):
     pair.append(config.coin[i] + "USDT")
+    leverage.append(config.set_Defaut_Leverage(float(client.LinearKline.LinearKline_get(symbol=pair[i], interval="1", limit=1, **{'from':get_timestamp(60)}).result()[0].get('result')[-1].get('close'))))
 
 query = 20
-def get_timestamp(recent): return int(time.time()) - recent
-def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(query*60*60)}).result()[0].get('result')    
-def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(query*24*60*60)}).result()[0].get('result')    
+def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(query*60*60)}).result()[0].get('result')
+def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(query*24*60*60)}).result()[0].get('result')
 def position_information(i): return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
 
 def LONG_SIDE(response):

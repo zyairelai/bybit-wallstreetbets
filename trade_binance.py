@@ -13,7 +13,7 @@ def lets_make_some_money(i):
     mid  = EMA.compute(8, dataset)
     high = EMA.compute(13, dataset)
 
-    leverage = config.leverage[i]
+    leverage = binance_futures_api.leverage[i]
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)
     if response.get('marginType') != "isolated": binance_futures_api.change_margin_to_ISOLATED(i)
 

@@ -3,12 +3,12 @@ enable_scheduler = False
 
 coin     = ["BTC", "ETH"]
 quantity = [0.001, 0.01]
-leverage = [30, 20]
 
-# Recommended Leverage
-# if   markPrice[i] < 1: leverage.append(5)
-# elif markPrice[i] < 10: leverage.append(10)
-# elif markPrice[i] < 100: leverage.append(15)
-# elif markPrice[i] < 1000: leverage.append(20)
-# elif markPrice[i] < 10000: leverage.append(25)
-# elif markPrice[i] < 100000: leverage.append(30)
+def set_Defaut_Leverage(markPrice):
+    if   markPrice < 1: leverage = 5
+    elif markPrice < 10: leverage = 10
+    elif markPrice < 100: leverage = 15
+    elif markPrice < 1000: leverage = 20
+    elif markPrice < 10000: leverage = 25
+    else: leverage = 30
+    return int(leverage)
