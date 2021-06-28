@@ -63,11 +63,13 @@ def GO_SHORT_CONDITION(klines, low, mid, high):
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
     if (bybit_api.upper_wick > bybit_api.candle_body + bybit_api.lower_wick) or \
+       (bybit_api.strong_candle(klines) and bybit_api.candle_color(klines) == "RED") or \
         bybit_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and \
         bybit_api.candle_color(klines) == "RED": return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
     if (bybit_api.lower_wick > bybit_api.candle_body + bybit_api.upper_wick) or \
+       (bybit_api.strong_candle(klines) and bybit_api.candle_color(klines) == "GREEN") or \
         bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
         bybit_api.candle_color(klines) == "GREEN": return True
 
