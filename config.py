@@ -2,7 +2,7 @@ live_trade = False
 enable_scheduler = False
 
 coin     = ["BTC", "ETH"]
-quantity = [0.001, 0.01]
+quantity = [0.01, 0.1]
 
 def set_Defaut_Leverage(markPrice):
     if   markPrice < 1: leverage = 5
