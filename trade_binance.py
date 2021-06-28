@@ -47,13 +47,13 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_UPWARD(low, mid, high) and \
+    if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
         binance_futures_api.strong_candle(klines) and \
         binance_futures_api.candle_color(klines) == "GREEN" and \
         binance_futures_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if EMA.DELTA_DOWNWARD(low, mid, high) and \
+    if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
         binance_futures_api.strong_candle(klines) and \
         binance_futures_api.candle_color(klines) == "RED" and \
         binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True

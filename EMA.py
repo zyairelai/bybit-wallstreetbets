@@ -30,3 +30,9 @@ def DELTA_UPWARD(low, mid, high):
 
 def DELTA_DOWNWARD(low, mid, high):
     if DOWNWARD_MOVEMENT(low) and DOWNWARD_MOVEMENT(mid) and DOWNWARD_MOVEMENT(high): return True
+
+def ABSOLUTE_UPTREND(low, mid, high):
+    if current(low) > current(mid) and current(mid) > current(high): return True
+
+def ABSOLUTE_DOWNTREND(low, mid, high):
+    if current(high) > current(mid) and current(mid) > current(low): return True
