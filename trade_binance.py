@@ -59,14 +59,22 @@ def GO_SHORT_CONDITION(klines, low, mid, high):
         binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
-    if (binance_futures_api.upper_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.lower_wick(klines)) or \
-       (binance_futures_api.strong_candle(klines) and binance_futures_api.candle_color(klines) == "RED") or \
-       (binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and binance_futures_api.candle_color(klines) == "RED"): return True
+    if (binance_futures_api.strong_candle(klines) or binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) or \
+        binance_futures_api.upper_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.lower_wick(klines)) and \
+        binance_futures_api.candle_color(klines) == "RED": return True
+
+    # if (binance_futures_api.upper_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.lower_wick(klines)) or \
+    #    (binance_futures_api.strong_candle(klines) and binance_futures_api.candle_color(klines) == "RED") or \
+    #    (binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and binance_futures_api.candle_color(klines) == "RED"): return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
-    if (binance_futures_api.lower_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.upper_wick(klines)) or \
-       (binance_futures_api.strong_candle(klines) and binance_futures_api.candle_color(klines) == "GREEN") or \
-       (binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) and binance_futures_api.candle_color(klines) == "GREEN"): return True
+    if (binance_futures_api.strong_candle(klines) or binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) or \
+        binance_futures_api.lower_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.upper_wick(klines)) and \
+        binance_futures_api.candle_color(klines) == "GREEN": return True
+
+    # if (binance_futures_api.lower_wick(klines) > binance_futures_api.candle_body(klines) + binance_futures_api.upper_wick(klines)) or \
+    #    (binance_futures_api.strong_candle(klines) and binance_futures_api.candle_color(klines) == "GREEN") or \
+    #    (binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) and binance_futures_api.candle_color(klines) == "GREEN"): return True
 
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT
