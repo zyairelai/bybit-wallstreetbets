@@ -48,24 +48,24 @@ def lets_make_some_money(i):
 
 def GO_LONG_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
+        binance_futures_api.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
         binance_futures_api.strong_candle(klines) and \
-        binance_futures_api.candle_color(klines) == "GREEN" and \
-        binance_futures_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
+        binance_futures_api.candle_color(klines) == "GREEN": return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
+        binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
         binance_futures_api.strong_candle(klines) and \
-        binance_futures_api.candle_color(klines) == "RED" and \
-        binance_futures_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
+        binance_futures_api.candle_color(klines) == "RED": return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
-    if EMA.DOWNWARD_MOVEMENT(low) and \
-        binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and \
+    if (binance_futures_api.candle_body(klines) > binance_futures_api.previous_candle_body(klines) or \
+        binance_futures_api.current_close(klines) < EMA.HIGHEST(low, mid, high) or EMA.DOWNWARD_MOVEMENT(low)) and \
         binance_futures_api.candle_color(klines) == "RED": return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
-    if EMA.UPWARD_MOVEMENT(low) and \
-        binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
+    if (binance_futures_api.candle_body(klines) > binance_futures_api.previous_candle_body(klines) or \
+        binance_futures_api.current_close(klines) > EMA.LOWEST(low, mid, high) or EMA.UPWARD_MOVEMENT(low)) and \
         binance_futures_api.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================

@@ -88,3 +88,9 @@ def lower_wick(klines):
 
 def strong_candle(klines):
     if candle_body(klines) > candle_wick(klines): return True
+
+def previous_open(klines)  : return float(klines[-2][1])
+def previous_high(klines)  : return float(klines[-2][2])
+def previous_low(klines)   : return float(klines[-2][3])
+def previous_close(klines) : return float(klines[-2][4])
+def previous_candle_body(klines) : return abs(previous_open(klines) - previous_close(klines))

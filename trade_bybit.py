@@ -51,22 +51,24 @@ def lets_make_some_money(i):
 
 def GO_LONG_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
-        bybit_api.strong_candle(klines) and bybit_api.candle_color(klines) == "GREEN" and \
-        bybit_api.current_close(klines) > EMA.MIDDLE(low, mid, high): return True
+        bybit_api.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
+        bybit_api.strong_candle(klines) and \
+        bybit_api.candle_color(klines) == "GREEN": return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
-        bybit_api.strong_candle(klines) and bybit_api.candle_color(klines) == "RED" and \
-        bybit_api.current_close(klines) < EMA.MIDDLE(low, mid, high): return True
+        bybit_api.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
+        bybit_api.strong_candle(klines) and \
+        bybit_api.candle_color(klines) == "RED": return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
-    if EMA.DOWNWARD_MOVEMENT(low) and \
-        bybit_api.current_close(klines) < EMA.HIGHEST(low, mid, high) and \
+    if (bybit_api.candle_body(klines) > bybit_api.previous_candle_body(klines) or \
+        bybit_api.current_close(klines) < EMA.HIGHEST(low, mid, high) or EMA.DOWNWARD_MOVEMENT(low)) and \
         bybit_api.candle_color(klines) == "RED": return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
-    if EMA.UPWARD_MOVEMENT(low) and \
-        bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) and \
+    if (bybit_api.candle_body(klines) > bybit_api.previous_candle_body(klines) or \
+        bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) or EMA.UPWARD_MOVEMENT(low)) and \
         bybit_api.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================
