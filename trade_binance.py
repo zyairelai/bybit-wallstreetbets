@@ -9,9 +9,9 @@ def lets_make_some_money(i):
     response = binance_futures_api.position_information(i)
     dataset  = binance_futures_api.closing_price_list(klines)
 
-    low  = EMA.compute(5, dataset)
-    mid  = EMA.compute(8, dataset)
-    high = EMA.compute(13, dataset)
+    low  = EMA.compute(8, dataset)
+    mid  = EMA.compute(13, dataset)
+    high = EMA.compute(21, dataset)
 
     leverage = binance_futures_api.leverage[i]
     if int(response.get("leverage")) != leverage: binance_futures_api.change_leverage(i, leverage)

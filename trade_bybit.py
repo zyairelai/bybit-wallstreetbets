@@ -9,9 +9,9 @@ def lets_make_some_money(i):
     response = bybit_api.position_information(i)
     dataset  = bybit_api.closing_price_list(klines)
 
-    low  = EMA.compute(5, dataset)
-    mid  = EMA.compute(8, dataset)
-    high = EMA.compute(13, dataset)
+    low  = EMA.compute(8, dataset)
+    mid  = EMA.compute(13, dataset)
+    high = EMA.compute(21, dataset)
 
     leverage = bybit_api.leverage[i]
     if response[0].get('leverage') != leverage: bybit_api.change_leverage(i, leverage)
