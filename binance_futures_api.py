@@ -88,6 +88,9 @@ def lower_wick(klines):
 
 def strong_candle(klines):
     if candle_body(klines) > candle_wick(klines): return True
+    else:
+        if candle_color(klines) == "GREEN" and current_close(klines) > previous_high(klines): return True
+        elif candle_color(klines) == "RED" and current_close(klines) < previous_low(klines): return True
 
 def previous_open(klines)  : return float(klines[-2][1])
 def previous_high(klines)  : return float(klines[-2][2])
