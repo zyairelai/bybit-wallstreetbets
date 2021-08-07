@@ -30,9 +30,9 @@ USE IT AT YOUR OWN RISK!
 <a name="how_it_works"></a>
 ## HOW-IT-WORKS
 
-1. As usual, with the 5-8-13 EMA, however we do not look at whether it is UPTREND nor DOWNTREND.  
+1. As usual, but this with the 8-13-21 EMA.  
 
-2. We only focus on the candle size, to consider a good strong candle, its candle body shall be bigger than the sum of the both wicks.  
+2. Then we focus on the candle size, to consider a good strong candle, its candle body shall be bigger than the sum of the both wicks.  
 
 3. For LONG position, it triggers a buy order if it is a **GREEN STRONG CANDLE** that the close hits above the **MIDDLE** line.  
 
