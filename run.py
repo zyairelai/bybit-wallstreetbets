@@ -1,4 +1,5 @@
 import bybit_api
+import candlestick
 import config, EMA
 from datetime import datetime
 from termcolor import colored
@@ -7,11 +8,12 @@ def lets_make_some_money(i):
     print(bybit_api.pair[i])
     klines   = bybit_api.KLINE_INTERVAL_1DAY(i)
     response = bybit_api.position_information(i)
-    dataset  = bybit_api.closing_price_list(klines)
+    dataset  = candlestick.closing_price_list(klines)
+    decimal  = candlestick.price_decimal_place(klines)
 
-    low  = EMA.compute(8, dataset)
-    mid  = EMA.compute(13, dataset)
-    high = EMA.compute(21, dataset)
+    low  = EMA.compute(8, dataset, decimal)
+    mid  = EMA.compute(13, dataset, decimal)
+    high = EMA.compute(21, dataset, decimal)
 
     leverage = bybit_api.leverage[i]
     if response[0].get('leverage') != leverage: bybit_api.change_leverage(i, leverage)
@@ -51,25 +53,25 @@ def lets_make_some_money(i):
 
 def GO_LONG_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
-        bybit_api.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
-        bybit_api.strong_candle(klines) and \
-        bybit_api.candle_color(klines) == "GREEN": return True
+        candlestick.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
+        candlestick.strong_candle(klines) and \
+        candlestick.candle_color(klines) == "GREEN": return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
     if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
-        bybit_api.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
-        bybit_api.strong_candle(klines) and \
-        bybit_api.candle_color(klines) == "RED": return True
+        candlestick.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
+        candlestick.strong_candle(klines) and \
+        candlestick.candle_color(klines) == "RED": return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
-    if (bybit_api.candle_body(klines) > bybit_api.previous_candle_body(klines) or \
-        bybit_api.current_close(klines) < EMA.HIGHEST(low, mid, high) or EMA.DOWNWARD_MOVEMENT(low)) and \
-        bybit_api.candle_color(klines) == "RED": return True
+    if (candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
+        candlestick.current_close(klines) < EMA.HIGHEST(low, mid, high) or EMA.DOWNWARD_MOVEMENT(low)) and \
+        candlestick.candle_color(klines) == "RED": return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
-    if (bybit_api.candle_body(klines) > bybit_api.previous_candle_body(klines) or \
-        bybit_api.current_close(klines) > EMA.LOWEST(low, mid, high) or EMA.UPWARD_MOVEMENT(low)) and \
-        bybit_api.candle_color(klines) == "GREEN": return True
+    if (candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
+        candlestick.current_close(klines) > EMA.LOWEST(low, mid, high) or EMA.UPWARD_MOVEMENT(low)) and \
+        candlestick.candle_color(klines) == "GREEN": return True
 
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT

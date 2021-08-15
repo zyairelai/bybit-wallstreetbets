@@ -16,7 +16,7 @@ def current_low(klines)  : return float(klines[-1].get('low'))
 
 pair, leverage = [], []
 for i in range(len(config.coin)):
-    pair.append(config.coin[i] + "USDT")
+    pair.append(config.coin[i].upper() + "USDT")
     leverage.append(config.set_Defaut_Leverage(float(client.LinearKline.LinearKline_get(symbol=pair[i], interval="1", limit=1, **{'from':get_timestamp(60)}).result()[0].get('result')[-1].get('close'))))
 
 query = 20
@@ -32,11 +32,8 @@ def SHORT_SIDE(response):
     if response[1].get('size') > 0 : return "SHORTING"
     elif response[1].get('size') == 0: return "NO_POSITION"
 
-def closing_price_list(klines):
-    closing_price_list = []
-    for count in range(len(klines)):
-        closing_price_list.append(klines[count].get('close'))
-    return closing_price_list
+def cancle_all_active_order(i):
+    if live_trade: client.LinearOrder.LinearOrder_cancelAll(symbol=pair[i])
 
 def change_leverage(i, leverage):
     if live_trade:
@@ -54,29 +51,6 @@ def disable_auto_add_margin(i):
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Buy", auto_add_margin=False).result()
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Sell", auto_add_margin=False).result()
 
-# ==================================================================================================================================================================================================================================
-
-def cancle_all_active_order(i):
-    if live_trade: client.LinearOrder.LinearOrder_cancelAll(symbol=pair[i])
-
-def limit_open_long(i, price):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
-
-def limit_open_short(i, price):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
-
-def limit_close_long(i, response, price):
-    if live_trade:
-        positionAmt = response[0].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
-
-def limit_close_short(i, response, price):
-    if live_trade:
-        positionAmt = response[1].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
-
-# ==================================================================================================================================================================================================================================
-
 def open_long_position(i):
     if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False)
 
@@ -93,36 +67,22 @@ def close_short(i, response):
         positionAmt = response[1].get('size')
         return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
 
-def current_open(klines) : return float(klines[-1].get('open'))
-def current_close(klines): return float(klines[-1].get('close'))
-def current_high(klines) : return float(klines[-1].get('high'))
-def current_low(klines)  : return float(klines[-1].get('low'))
-def candle_body(klines)  : return abs(current_open(klines) - current_close(klines))
-def candle_wick(klines)  : return current_high(klines) - current_low(klines) - candle_body(klines)
+# ==================================================================================================================================================================================================================================
+# LIMIT ORDER
+# ==================================================================================================================================================================================================================================
 
-def candle_color(klines):
-    if current_close(klines) > current_open(klines): return "GREEN"
-    elif current_close(klines) < current_open(klines): return "RED"
-    else: return "INDECISIVE"
+def limit_open_long(i, price):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def upper_wick(klines):
-    if candle_color(klines) == "GREEN": return current_high(klines) - current_close(klines)
-    elif candle_color(klines) == "RED": return current_high(klines) - current_open(klines)
-    else: return 0
+def limit_open_short(i, price):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def lower_wick(klines):
-    if candle_color(klines) == "GREEN": return current_open(klines)  - current_low(klines)
-    elif candle_color(klines) == "RED": return current_close(klines) - current_low(klines)
-    else: return 0
+def limit_close_long(i, response, price):
+    if live_trade:
+        positionAmt = response[0].get('size')
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def strong_candle(klines):
-    if candle_body(klines) > candle_wick(klines): return True
-    else:
-        if candle_color(klines) == "GREEN" and current_close(klines) > previous_high(klines): return True
-        elif candle_color(klines) == "RED" and current_close(klines) < previous_low(klines): return True
-
-def previous_open(klines)  : return float(klines[-2].get('open'))
-def previous_high(klines)  : return float(klines[-2].get('high'))
-def previous_low(klines)   : return float(klines[-2].get('low'))
-def previous_close(klines) : return float(klines[-2].get('close'))
-def previous_candle_body(klines) : return abs(previous_open(klines) - previous_close(klines))
+def limit_close_short(i, response, price):
+    if live_trade:
+        positionAmt = response[1].get('size')
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)

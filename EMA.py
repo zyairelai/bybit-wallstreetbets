@@ -1,8 +1,11 @@
-def compute(digit, dataset):
-    import pandas as pd
+import pandas as pd
+
+def compute(digit, dataset, decimal_place):
     df = pd.DataFrame(dataset)
     ema = df.ewm(span=digit).mean()
-    return ema[0].values.tolist()
+    list_of_ema = ema[0].values.tolist()
+    round_off = [round(each_element, decimal_place) for each_element in list_of_ema]
+    return round_off
 
 def current(EMA_list) : return float(EMA_list[-1])
 def previous(EMA_list): return float(EMA_list[-2])
