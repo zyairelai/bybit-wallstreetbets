@@ -54,27 +54,44 @@ def disable_auto_add_margin(i):
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Buy", auto_add_margin=False).result()
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Sell", auto_add_margin=False).result()
 
-def open_long_position(i):
+# ==================================================================================================================================================================================================================================
+
+def cancle_all_active_order(i):
+    if live_trade: client.LinearOrder.LinearOrder_cancelAll(symbol=pair[i])
+
+def limit_open_long(i, price):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+
+def limit_open_short(i, price):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+
+def limit_close_long(i, response, price):
     if live_trade:
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Market",
-        time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
+        positionAmt = response[0].get('size')
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+
+def limit_close_short(i, response, price):
+    if live_trade:
+        positionAmt = response[1].get('size')
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+
+# ==================================================================================================================================================================================================================================
+
+def open_long_position(i):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False)
 
 def open_short_position(i):
-    if live_trade:
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Market",
-        time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False)
 
 def close_long(i, response):
     if live_trade:
         positionAmt = response[0].get('size')
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Market",
-        time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
 
 def close_short(i, response):
     if live_trade:
         positionAmt = response[1].get('size')
-        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Market",
-        time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
+        return client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
 
 def current_open(klines) : return float(klines[-1].get('open'))
 def current_close(klines): return float(klines[-1].get('close'))
