@@ -21,6 +21,11 @@ def closing_price_list(klines):
         closing_price_list.append(klines[count].get('close'))
     return closing_price_list
 
+def previous_candle_color(klines):
+    if previous_close(klines) > previous_open(klines): return "GREEN"
+    elif previous_close(klines) < previous_open(klines): return "RED"
+    else: return "INDECISIVE"
+
 def candle_color(klines):
     if current_close(klines) > current_open(klines): return "GREEN"
     elif current_close(klines) < current_open(klines): return "RED"
