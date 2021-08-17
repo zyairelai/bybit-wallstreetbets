@@ -23,7 +23,7 @@ query = 20
 def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(query*60*60)}).result()[0].get('result')
 def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(query*24*60*60)}).result()[0].get('result')
 def position_information(i): return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
-def get_orderbook_price(i) : return client.Market.Market_orderbook(symbol=pair[i]).result()[0].get('result')[0].get('price')
+def get_orderbook_price(i) : return float(client.Market.Market_orderbook(symbol=pair[i]).result()[0].get('result')[0].get('price'))
 
 def LONG_SIDE(response):
     if response[0].get('size') > 0: return "LONGING"
@@ -72,18 +72,18 @@ def close_short(i, response):
 # LIMIT ORDER
 # ==================================================================================================================================================================================================================================
 
-def limit_open_long(i, price):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+def limit_open_long(i):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def limit_open_short(i, price):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+def limit_open_short(i):
+    if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def limit_close_long(i, response, price):
+def limit_close_long(i, response):
     if live_trade:
         positionAmt = response[0].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
 
-def limit_close_short(i, response, price):
+def limit_close_short(i, response):
     if live_trade:
         positionAmt = response[1].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=price, time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False)

@@ -20,9 +20,9 @@ low  = EMA.compute(8, dataset, decimal)
 mid  = EMA.compute(13, dataset, decimal)
 high = EMA.compute(21, dataset, decimal)
 
-orderbook = client.Market.Market_orderbook(symbol=pair).result()[0].get('result')[0].get('price')
+orderbook = float(client.Market.Market_orderbook(symbol=pair).result()[0].get('result')[0].get('price'))
 
-print(orderbook)
+print(type(orderbook))
 
 def cancle_all_active_order(): client.LinearOrder.LinearOrder_cancelAll(symbol=pair)
 

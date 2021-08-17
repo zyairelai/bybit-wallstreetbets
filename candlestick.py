@@ -45,12 +45,7 @@ def lower_wick(klines):
     else: return 0
 
 def strong_candle(klines):
-    if candle_body(klines) > candle_wick(klines): return True
-    else:
-        if candle_color(klines) == "GREEN" and current_close(klines) > previous_high(klines): return True
-        elif candle_color(klines) == "RED" and current_close(klines) < previous_low(klines): return True
-
-def new_strong_candle(klines):
+    # if candle_body(klines) > candle_wick(klines): return True
     if candle_color(klines) == "GREEN":
         if previous_candle_color(klines) == "GREEN":
             if current_close(klines) > previous_close(klines): return True
@@ -62,21 +57,3 @@ def new_strong_candle(klines):
             if current_close(klines) < previous_low(klines): return True
         elif previous_candle_color(klines) == "RED":
             if current_close(klines) < previous_close(klines): return True
-
-def GO_LONG_PRICE(klines):
-    if previous_candle_color(klines) == "GREEN":
-        if current_close(klines) > previous_high(klines): return current_close(klines)
-        else : return previous_high(klines)
-    elif previous_candle_color(klines) == "RED":
-        if   current_close(klines) > previous_high(klines): return current_close(klines)
-        elif current_close(klines) > previous_open(klines): return previous_high(klines)
-        else : return previous_open(klines)
-
-def GO_SHORT_PRICE(klines):
-    if previous_candle_color(klines) == "GREEN":
-        if   current_close(klines) < previous_low(klines): return current_close(klines)
-        elif current_close(klines) < previous_open(klines): return previous_low(klines)
-        else : return previous_open(klines)
-    elif previous_candle_color(klines) == "RED":
-        if current_close(klines) < previous_low(klines): return current_close(klines)
-        else : return previous_low(klines)
