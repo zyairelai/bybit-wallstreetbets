@@ -64,14 +64,18 @@ def GO_SHORT_CONDITION(klines, low, mid, high):
         candlestick.candle_color(klines) == "RED": return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
-    if (candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
-        candlestick.current_close(klines) < EMA.HIGHEST(low, mid, high) or EMA.DOWNWARD_MOVEMENT(low)) and \
-        candlestick.candle_color(klines) == "RED": return True
+    if candlestick.candle_color(klines) == "RED":
+        if  EMA.DOWNWARD_MOVEMENT(low) or \
+            candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
+            candlestick.current_close(klines) < EMA.HIGHEST(low, mid, high) or \
+            candlestick.strong_candle(klines): return True
 
 def EXIT_SHORT_CONDITION(klines, low, mid, high):
-    if (candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
-        candlestick.current_close(klines) > EMA.LOWEST(low, mid, high) or EMA.UPWARD_MOVEMENT(low)) and \
-        candlestick.candle_color(klines) == "GREEN": return True
+    if candlestick.candle_color(klines) == "GREEN":
+        if  EMA.UPWARD_MOVEMENT(low) or \
+            candlestick.current_close(klines) > EMA.LOWEST(low, mid, high) or \
+            candlestick.candle_body(klines) > candlestick.previous_candle_body(klines) or \
+            candlestick.strong_candle(klines): return True
 
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT
