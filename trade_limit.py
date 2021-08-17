@@ -23,32 +23,38 @@ def lets_make_some_money(i):
     if not response[1].get('is_isolated'): bybit_api.change_margin_to_ISOLATED(i, leverage)
 
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
-        if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and candlestick.candle_color(klines) == "GREEN":
+        if LONG_CONDITION(klines, low, mid, high):
             bybit_api.limit_open_long(i, GO_LONG_PRICE(klines))
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("LONG_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
-        if candlestick.candle_color(klines) == "RED":
-            bybit_api.limit_close_long(i, response, EXIT_LONG_PRICE(klines, low, mid, high))
-        else: print(colored("HOLDING_LONG", "green"))
+        print(colored("HOLDING_LONG", "green"))
+        bybit_api.limit_close_long(i, response, EXIT_LONG_PRICE(klines, low, mid, high))
+        bybit_api.limit_close_long(i, response, EMA.HIGHEST(low, mid, high))
 
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
-        if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and candlestick.candle_color(klines) == "RED":
+        if SHORT_CONDITION(klines, low, mid, high):
             bybit_api.limit_open_short(i, GO_SHORT_PRICE(klines))
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("SHORT_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
-        if candlestick.candle_color(klines) == "GREEN":
-            bybit_api.limit_close_short(i, response, EXIT_SHORT_PRICE(klines, low, mid, high))
-        else: print(colored("HOLDING_SHORT", "red"))
+        print(colored("HOLDING_SHORT", "red"))
+        bybit_api.limit_close_short(i, response, EXIT_SHORT_PRICE(klines, low, mid, high))
+        bybit_api.limit_close_short(i, response, EMA.LOWEST(low, mid, high))
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
 # ==========================================================================================================================================================================
 #                                                    ENTRY CONDITIONS
 # ==========================================================================================================================================================================
+
+def LONG_CONDITION(klines, low, mid, high): 
+    if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and candlestick.candle_color(klines) == "GREEN": return True
+
+def SHORT_CONDITION(klines, low, mid, high): 
+    if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and candlestick.candle_color(klines) == "RED": return True
 
 def GO_LONG_PRICE(klines):
     if candlestick.previous_candle_color(klines) == "GREEN":
@@ -68,17 +74,13 @@ def GO_SHORT_PRICE(klines):
         if candlestick.current_close(klines) < candlestick.previous_low(klines): return candlestick.current_close(klines)
         else : return candlestick.previous_low(klines)
 
-def EXIT_LONG_PRICE(klines, low, mid, high):
-    if candlestick.previous_low(klines) > EMA.HIGHEST(low, mid, high):
-        if candlestick.previous_candle_color == "GREEN": return candlestick.previous_low(klines)
-        elif candlestick.previous_candle_color == "RED": return candlestick.previous_close(klines)
-    else: return EMA.HIGHEST(low, mid, high)
+def EXIT_LONG_PRICE(klines):
+    if candlestick.previous_candle_color == "GREEN": return candlestick.previous_low(klines)
+    elif candlestick.previous_candle_color == "RED": return candlestick.previous_close(klines)
 
-def EXIT_SHORT_PRICE(klines, low, mid, high):
-    if candlestick.previous_high(klines) < EMA.LOWEST(low, mid, high):
-        if candlestick.previous_candle_color == "GREEN": return candlestick.previous_close(klines)
-        elif candlestick.previous_candle_color == "RED": return candlestick.previous_high(klines)
-    else: return EMA.LOWEST(low, mid, high)
+def EXIT_SHORT_PRICE(klines):
+    if candlestick.previous_candle_color == "GREEN": return candlestick.previous_close(klines)
+    elif candlestick.previous_candle_color == "RED": return candlestick.previous_high(klines)
 
 # ==========================================================================================================================================================================
 #                                                    DEPLOY THE BOT

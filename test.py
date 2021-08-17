@@ -5,7 +5,7 @@ api_key    = os.environ.get('BYBIT_KEY')
 api_secret = os.environ.get('BYBIT_SECRET')
 client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 
-pair = "ltc".upper() + "USDT"
+pair = "btc".upper() + "USDT"
 quantity = 1
 price = 0.3
 
@@ -19,6 +19,10 @@ decimal = candlestick.price_decimal_place(klines)
 low  = EMA.compute(8, dataset, decimal)
 mid  = EMA.compute(13, dataset, decimal)
 high = EMA.compute(21, dataset, decimal)
+
+orderbook = client.Market.Market_orderbook(symbol=pair).result()[0].get('result')[0].get('price')
+
+print(orderbook)
 
 def cancle_all_active_order(): client.LinearOrder.LinearOrder_cancelAll(symbol=pair)
 

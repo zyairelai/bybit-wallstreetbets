@@ -23,6 +23,7 @@ query = 20
 def KLINE_INTERVAL_1HOUR(i): return client.LinearKline.LinearKline_get(symbol=pair[i], interval="60", limit=query, **{'from':get_timestamp(query*60*60)}).result()[0].get('result')
 def KLINE_INTERVAL_1DAY(i) : return client.LinearKline.LinearKline_get(symbol=pair[i], interval="D" , limit=query, **{'from':get_timestamp(query*24*60*60)}).result()[0].get('result')
 def position_information(i): return client.LinearPositions.LinearPositions_myPosition(symbol=pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
+def get_orderbook_price(i) : return client.Market.Market_orderbook(symbol=pair[i]).result()[0].get('result')[0].get('price')
 
 def LONG_SIDE(response):
     if response[0].get('size') > 0: return "LONGING"
