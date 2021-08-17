@@ -23,25 +23,25 @@ def lets_make_some_money(i):
 
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
         if GO_LONG_CONDITION(klines, low, mid, high):
-            bybit_api.limit_open_long(i)
+            bybit_api.open_long_position(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("LONG_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
         if EXIT_LONG_CONDITION(klines, low, mid, high):
-            bybit_api.limit_close_long(i, response)
+            bybit_api.close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
         if GO_SHORT_CONDITION(klines, low, mid, high):
-            bybit_api.limit_open_short(i)
+            bybit_api.open_short_position(i)
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("SHORT_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
         if EXIT_SHORT_CONDITION(klines, low, mid, high):
-            bybit_api.limit_close_short(i, response)
+            bybit_api.close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
 
@@ -52,16 +52,16 @@ def lets_make_some_money(i):
 # ==========================================================================================================================================================================
 
 def GO_LONG_CONDITION(klines, low, mid, high):
-    if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
-        candlestick.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
-        candlestick.strong_candle(klines) and \
-        candlestick.candle_color(klines) == "GREEN": return True
+    if candlestick.candle_color(klines) == "GREEN":
+        if not EMA.ABSOLUTE_DOWNTREND(low, mid, high) and EMA.DELTA_UPWARD(low, mid, high) and \
+            candlestick.current_close(klines) > EMA.MIDDLE(low, mid, high) and \
+            candlestick.strong_candle(klines): return True
 
 def GO_SHORT_CONDITION(klines, low, mid, high):
-    if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
-        candlestick.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
-        candlestick.strong_candle(klines) and \
-        candlestick.candle_color(klines) == "RED": return True
+    if candlestick.candle_color(klines) == "RED":
+        if not EMA.ABSOLUTE_UPTREND(low, mid, high) and EMA.DELTA_DOWNWARD(low, mid, high) and \
+            candlestick.current_close(klines) < EMA.MIDDLE(low, mid, high) and \
+            candlestick.strong_candle(klines): return True
 
 def EXIT_LONG_CONDITION(klines, low, mid, high):
     if candlestick.candle_color(klines) == "RED":
