@@ -33,9 +33,6 @@ def SHORT_SIDE(response):
     if response[1].get('size') > 0 : return "SHORTING"
     elif response[1].get('size') == 0: return "NO_POSITION"
 
-def cancle_all_active_order(i):
-    if live_trade: client.LinearOrder.LinearOrder_cancelAll(symbol=pair[i]).result()
-
 def change_leverage(i, leverage):
     if live_trade: client.LinearPositions.LinearPositions_saveLeverage(symbol=pair[i], buy_leverage=leverage, sell_leverage=leverage).result()
 
@@ -68,6 +65,8 @@ def close_short(i, response):
 # ==================================================================================================================================================================================================================================
 # LIMIT ORDER
 # ==================================================================================================================================================================================================================================
+def cancle_all_active_order(i):
+    if live_trade: client.LinearOrder.LinearOrder_cancelAll(symbol=pair[i]).result()
 
 def limit_open_long(i):
     if live_trade: 
@@ -83,10 +82,10 @@ def limit_close_long(i, response):
     if live_trade:
         cancle_all_active_order(i)
         positionAmt = response[0].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False).result()
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=True, close_on_trigger=False).result()
 
 def limit_close_short(i, response):
     if live_trade:
         cancle_all_active_order(i)
         positionAmt = response[1].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=False, close_on_trigger=False).result()
+        client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Limit", price=get_orderbook_price(i), time_in_force="GoodTillCancel", reduce_only=True, close_on_trigger=False).result()
