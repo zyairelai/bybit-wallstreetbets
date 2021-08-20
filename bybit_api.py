@@ -46,18 +46,18 @@ def disable_auto_add_margin(i):
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Buy", auto_add_margin=False).result()
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=pair[i], side="Sell", auto_add_margin=False).result()
 
-def open_long_position(i):
+def market_open_long(i):
     if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
 
-def open_short_position(i):
+def market_open_short(i):
     if live_trade: client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
 
-def close_long(i, response):
+def market_close_long(i, response):
     if live_trade:
         positionAmt = response[0].get('size')
         client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Sell", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
 
-def close_short(i, response):
+def market_close_short(i, response):
     if live_trade:
         positionAmt = response[1].get('size')
         client.LinearOrder.LinearOrder_new(symbol=pair[i], side="Buy", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()

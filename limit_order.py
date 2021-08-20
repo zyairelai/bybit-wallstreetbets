@@ -23,25 +23,25 @@ def lets_make_some_money(i):
 
     if bybit_api.LONG_SIDE(response) == "NO_POSITION":
         if GO_LONG_CONDITION(klines, low, mid, high):
-            bybit_api.market_open_long(i)
+            bybit_api.limit_open_long(i)
             print(colored("🚀 GO_LONG 🚀", "green"))
         else: print("LONG_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.LONG_SIDE(response) == "LONGING":
         if EXIT_LONG_CONDITION(klines, low, mid, high):
-            bybit_api.market_close_long(i, response)
+            bybit_api.limit_close_long(i, response)
             print("💰 CLOSE_LONG 💰")
         else: print(colored("HOLDING_LONG", "green"))
 
     if bybit_api.SHORT_SIDE(response) == "NO_POSITION":
         if GO_SHORT_CONDITION(klines, low, mid, high):
-            bybit_api.market_short_position(i)
+            bybit_api.limit_open_short(i)
             print(colored("💥 GO_SHORT 💥", "red"))
         else: print("SHORT_SIDE : 🐺 WAIT 🐺")
 
     if bybit_api.SHORT_SIDE(response) == "SHORTING":
         if EXIT_SHORT_CONDITION(klines, low, mid, high):
-            bybit_api.market_close_short(i, response)
+            bybit_api.limit_close_short(i, response)
             print("💰 CLOSE_SHORT 💰")
         else: print(colored("HOLDING_SHORT", "red"))
 
