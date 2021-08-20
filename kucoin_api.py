@@ -24,3 +24,13 @@ def KLINE_INTERVAL_1HOUR(i): return spot_trading.get_kline_data(symbol=pair[i], 
 def KLINE_INTERVAL_1DAY(i) : return spot_trading.get_kline_data(symbol=pair[i], kline_type="1day" , start=get_timestamp(query*24*60*60), end=get_current_timestamp())
 
 klines = KLINE_INTERVAL_1HOUR(0)
+
+def current_open(klines)  : return float(klines[0][1])
+def current_close(klines) : return float(klines[0][2])
+def current_high(klines)  : return float(klines[0][3])
+def current_low(klines)   : return float(klines[0][4])
+
+def previous_open(klines)  : return float(klines[0][1])
+def previous_close(klines) : return float(klines[0][2])
+def previous_high(klines)  : return float(klines[0][3])
+def previous_low(klines)   : return float(klines[0][4])
