@@ -1,5 +1,6 @@
 live_trade = True
 enable_scheduler = False
+market_order = True
 
 coin     = ["BTC", "ETH", "BNB", "BCH"]
 quantity = [0.01, 0.1, 0.5, 0.4]

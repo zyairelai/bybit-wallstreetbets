@@ -92,6 +92,7 @@ The settings can be configured in `config.py`.
 | --------------------| -----------------------------------------------------------------------------------------------------------|
 | `live_trade`        |`True` to place actual order <br /> `False` to see sample output                                            |
 | `enable_scheduler`  |`True` to loop the code everytime when the minute hits 0 and 30, which means twice in one hour              |
+| `market_order`      |`True` to use market order <br /> `False` to use limit order                                                |
 | `coin`              | You can put your coin list here                                                                            |
 | `quantity`          | Amount of the trade amount you want to trade                                                               |
 | `leverage`          | The recommended leverage is all listed in the `config.py`.                                                 |
