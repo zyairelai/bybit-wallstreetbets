@@ -1,6 +1,3 @@
-from EMA import current
-
-
 def previous_open(klines)   : return float(klines[-2].get('open'))
 def previous_high(klines)   : return float(klines[-2].get('high'))
 def previous_low(klines)    : return float(klines[-2].get('low'))
@@ -50,10 +47,10 @@ def strong_candle(klines):
             if previous_candle_color(klines) == "GREEN":
                 if current_close(klines) > previous_close(klines): return True
             elif previous_candle_color(klines) == "RED":
-                if current_close(klines) > previous_high(klines): return True
-        
+                if current_close(klines) > previous_high(klines) and candle_body(klines) > previous_candle_body(klines): return True
+
         elif candle_color(klines) == "RED":
             if previous_candle_color(klines) == "GREEN":
-                if current_close(klines) < previous_low(klines): return True
+                if current_close(klines) < previous_low(klines) and candle_body(klines) > previous_candle_body(klines): return True
             elif previous_candle_color(klines) == "RED":
                 if current_close(klines) < previous_close(klines): return True
