@@ -17,8 +17,6 @@ This is a trading bot that suupports **Binance USDT-M Futures** and **Bybit USDT
 
 Inspired by [THE 5-8-13 STRATEGY](https://www.dolphintrader.com/5-8-13-forex-scalping-trading-strategy/). But Simpler and more practical after some tweaks.  
 
-You can check my daily PnL [HERE ON MY GOOGLE SHEET](https://docs.google.com/spreadsheets/d/1VsOY7B7WWT0D67ifggpbsdHrQEegl0DaXHfWhsx--tY/edit#gid=210739304)  
-
 <a name="hello_disclaimer"></a>
 ## DISCLAIMER
 I have no responsibility for any loss or hardship incurred directly or indirectly by using this code.
