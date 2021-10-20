@@ -13,11 +13,9 @@
 
 <a name="long_term_low_leverage"></a>
 ## LONG-TERM-LOW-LEVERAGE
-This is a trading bot that **ONLY SUPPORT Bybit USDT Perpetual**
+This is a trading bot that suupports **Binance USDT-M Futures** and **Bybit USDT Perpetual**
 
 Inspired by [THE 5-8-13 STRATEGY](https://www.dolphintrader.com/5-8-13-forex-scalping-trading-strategy/). But Simpler and more practical after some tweaks.  
-
-You can check my daily PnL [HERE ON MY GOOGLE SHEET](https://docs.google.com/spreadsheets/d/1VsOY7B7WWT0D67ifggpbsdHrQEegl0DaXHfWhsx--tY/edit#gid=210739304)  
 
 <a name="hello_disclaimer"></a>
 ## DISCLAIMER
@@ -52,13 +50,22 @@ USE IT AT YOUR OWN RISK!
 ### 1. ENVIRONMENT SETUP
 Setup your environment API key on the Terminal:
 ```
-export BYBIT_KEY="your_bybit_api_key"
+export BINANCE_KEY="your_binance_api_key"
+export BINANCE_SECRET="your_binance_secret_key"
+
+export BYBIT_KEY="your_api_bybit_key"
 export BYBIT_SECRET="your_bybit_secret_key"
 ```
 
-Or as an alternative, you can change `line 6-9` in `bybit_api.py` to following:  
+Or as an alternative, you can change `line 6-9` in `binance_futures_api.py` or `api_bybit.py` to following:  
+For `binance_futures_api.py`
 ```
-api_key     = "your_bybit_api_key"
+api_key     = "your_binance_api_key"
+api_secret  = "your_binance_secret_key"
+```
+For `api_bybit.py`
+```
+api_key     = "your_api_bybit_key"
 api_secret  = "your_bybit_secret_key"
 ```
 
@@ -70,6 +77,7 @@ pip3 install APScheduler==3.6.3
 pip3 install Bybit==0.2.12
 pip3 install cryptography==3.3.2
 pip3 install pandas==1.2.4
+pip3 install python-binance==0.7.5
 pip3 install termcolor==1.1.0
 ```
 
@@ -82,6 +90,7 @@ The settings can be configured in `config.py`.
 | --------------------| -----------------------------------------------------------------------------------------------------------|
 | `live_trade`        |`True` to place actual order <br /> `False` to see sample output                                            |
 | `enable_scheduler`  |`True` to loop the code everytime when the minute hits 0 and 30, which means twice in one hour              |
+| `market_order`      |`True` to use market order <br /> `False` to use limit order                                                |
 | `coin`              | You can put your coin list here                                                                            |
 | `quantity`          | Amount of the trade amount you want to trade                                                               |
 | `leverage`          | The recommended leverage is all listed in the `config.py`.                                                 |
@@ -95,8 +104,15 @@ Else, you can set `enable_scheduler = True` and the script will loop the program
 Now if you are all ready, set `live_trade = True` and ...
 
 Let's make the magic happens!
+
+### Command to on Binance
 ```
-python3 run.py
+python3 trade_binance.py
+```
+
+### Command to on Bybit
+```
+python3 trade_bybit.py
 ```
 
 <a name="discord"></a>
