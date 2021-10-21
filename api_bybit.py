@@ -9,10 +9,11 @@ api_secret = os.environ.get('BYBIT_SECRET')
 client     = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
 live_trade = config.live_trade
 
-def get_timestamp(recent)  : return int(time.time()) - recent
-def current_low(klines)    : return float(klines[-1].get('low'))
-def position_information(i): return client.LinearPositions.LinearPositions_myPosition(symbol=config.pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
-def get_orderbook_price(i) : return float(client.Market.Market_orderbook(symbol=config.pair[i]).result()[0].get('result')[0].get('price'))
+def get_timestamp(recent):
+    return int(time.time()) - recent
+
+def position_information(i):
+    return client.LinearPositions.LinearPositions_myPosition(symbol=config.pair[i]).result()[0].get('result')#[0_or_1].get('symbol')
 
 def LONG_SIDE(response):
     if response[0].get('size') > 0: return "LONGING"
