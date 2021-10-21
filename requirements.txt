@@ -1,7 +1,8 @@
 APScheduler
 bybit
 ccxt
-cryptography
 pandas
-python-binance
+requests
 termcolor
+python-binance
+cryptography==3.4.6
