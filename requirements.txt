@@ -2,7 +2,6 @@ APScheduler
 bybit
 ccxt
 pandas
-requests
 termcolor
 python-binance
 cryptography==3.4.6
