@@ -8,14 +8,14 @@ def klines_4HOUR(i):
     print(config.pair[i])
     klines = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], '4h', limit=query), columns=tohlcv_column)
     klines['color'] = klines.apply(candle_color, axis=1)
-    print(klines)
+    # print(klines)
     return klines
 
 def Moving_Average_of_Bitcoin():
     bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv("BTC/USDT", '1d', limit=query), columns=tohlcv_column)
     bitcoin['Moving_Avg'] = bitcoin["close"].rolling(window=50).mean()
     bitcoin = bitcoin.drop(['volume'], axis=1)
-    print(bitcoin)
+    # print(bitcoin)
     return bitcoin
 
 def candle_color(klines):

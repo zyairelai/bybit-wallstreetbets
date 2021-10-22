@@ -21,7 +21,7 @@ def lets_make_some_money():
             if strategy.GO_LONG_CONDITION(klines_4HOUR, bitcoin):
                 api_bybit.market_open_long(i)
                 print(colored("🚀 GO_LONG 🚀", "green"))
-            else: print("LONG_SIDE : 🐺 WAIT 🐺")
+            else: print("LONG_SIDE  : 🐺 WAIT 🐺")
 
         if api_bybit.LONG_SIDE(response) == "LONGING":
             if strategy.EXIT_LONG_CONDITION(klines_4HOUR, bitcoin):
