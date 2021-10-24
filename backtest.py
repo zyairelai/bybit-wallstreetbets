@@ -2,7 +2,7 @@ import config, strategy
 from datetime import datetime
 
 def backtest():
-    print("\n_Big_ Timeframe : " + strategy.big___timeframe)
+    print("\n_Big_ Timeframe : " + strategy.big_timeframe)
     print("Entry Timeframe : " + strategy.entry_timeframe + "\n")
 
     all_pairs = 0
@@ -19,7 +19,6 @@ def backtest():
         print("PNL for _Long Positions: " + str(long_result) + "%")
         print("PNL for Short Positions: " + str(short_reult) + "%")
         print("PNL for _BOTH Positions: " + str(overall_result) + "%")
-        # print("This backtest is generated based on past " + str(strategy.query) + " candlesticks")
         print()
     print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
 

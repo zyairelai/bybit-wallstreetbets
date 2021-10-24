@@ -2,11 +2,11 @@ live_trade = False
 enable_scheduler = False
 
 coin = ["BTC", "ETH", "BNB", "BCH", "LTC", "XRP"]
-quantity = [0.001, 0.005, 0.002, 0.02, 0.05, 10]
+quantity = [0.001, 0.01, 0.05, 0.05, 0.1, 30]
 
 leverage, pair = [], []
 for i in range(len(coin)):
     pair.append(coin[i] + "USDT")
-    if   coin[i] == "BTC": leverage.append(30)
-    elif coin[i] == "ETH": leverage.append(20)
-    else: leverage.append(10)
+    if   coin[i] == "BTC": leverage.append(40)
+    elif coin[i] == "ETH": leverage.append(30)
+    else: leverage.append(20)

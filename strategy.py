@@ -4,8 +4,7 @@ ccxt_client = ccxt.bybit()
 query = 100
 follow_btc_trend = False
 tohlcv_column = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
-
-big___timeframe = '4h'
+big_timeframe   = '4h'
 entry_timeframe = '1h'
 
 def klines(i):
@@ -15,14 +14,14 @@ def klines(i):
     return klines
 
 def Moving_Average(i):
-    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], big___timeframe, limit=query), columns=tohlcv_column)
+    klines = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], big_timeframe, limit=query), columns=tohlcv_column)
     moving_average = pandas.DataFrame()
-    moving_average['timestamp'] = bitcoin["timestamp"]
-    moving_average['MA'] = bitcoin["close"].rolling(window=50).mean()
+    moving_average['timestamp'] = klines["timestamp"]
+    moving_average['MA'] = klines["close"].rolling(window=50).mean()
     return moving_average
 
 def Moving_Average_of_Bitcoin():
-    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv("BTC/USDT", big___timeframe, limit=query), columns=tohlcv_column)
+    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv("BTC/USDT", big_timeframe, limit=query), columns=tohlcv_column)
     moving_average = pandas.DataFrame()
     moving_average['timestamp'] = bitcoin["timestamp"]
     moving_average['btc_close'] = bitcoin["close"]
@@ -35,7 +34,7 @@ def swing_trade(i, klines):
         klines  = pandas.merge_asof(klines, bitcoin, on='timestamp')
 
     self_MA = Moving_Average(i)
-    klines  = pandas.merge_asof(klines, self_MA, on='timestamp')    
+    klines  = pandas.merge_asof(klines, self_MA, on='timestamp')
     klines['high_s1'] = klines["high"].shift(1)
     klines['high_s2'] = klines["high"].shift(2)
     klines['low_s1'] = klines["low"].shift(1)
