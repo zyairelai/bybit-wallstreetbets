@@ -17,7 +17,7 @@ def lets_make_some_money():
         if not response[0].get('is_isolated'): api_bybit.change_margin_to_ISOLATED(i)
         if not response[1].get('is_isolated'): api_bybit.change_margin_to_ISOLATED(i)
         swing_trades = swing_trades.drop(['open', 'volume'], axis=1)
-        print(swing_trades)
+        # print(swing_trades)
 
         if api_bybit.LONG_SIDE(response) == "NO_POSITION":
             if swing_trades["GO_LONG"].iloc[-1]:
@@ -47,7 +47,7 @@ def lets_make_some_money():
 try:
     if config.enable_scheduler:
         scheduler = BlockingScheduler()
-        scheduler.add_job(lets_make_some_money, 'cron', minute='0,10,20,30,40,50')
+        scheduler.add_job(lets_make_some_money, 'cron', second='0')
         scheduler.start()
     else: lets_make_some_money()
 
