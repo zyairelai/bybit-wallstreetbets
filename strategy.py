@@ -2,56 +2,69 @@ import config, ccxt, pandas
 ccxt_client = ccxt.bybit()
 
 query = 100
+follow_btc_trend = False
 tohlcv_column = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
-def klines_4HOUR(i):
+big___timeframe = '4h'
+entry_timeframe = '1h'
+
+def klines(i):
     print(config.pair[i])
-    klines = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], '4h', limit=query), columns=tohlcv_column)
+    klines = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], entry_timeframe, limit=query), columns=tohlcv_column)
     klines['color'] = klines.apply(candle_color, axis=1)
-    # print(klines)
     return klines
 
+def Moving_Average(i):
+    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv(config.pair[i], big___timeframe, limit=query), columns=tohlcv_column)
+    moving_average = pandas.DataFrame()
+    moving_average['timestamp'] = bitcoin["timestamp"]
+    moving_average['MA'] = bitcoin["close"].rolling(window=50).mean()
+    return moving_average
+
 def Moving_Average_of_Bitcoin():
-    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv("BTC/USDT", '1d', limit=query), columns=tohlcv_column)
-    bitcoin['Moving_Avg'] = bitcoin["close"].rolling(window=50).mean()
-    bitcoin = bitcoin.drop(['volume'], axis=1)
-    # print(bitcoin)
-    return bitcoin
+    bitcoin = pandas.DataFrame(ccxt_client.fetch_ohlcv("BTC/USDT", big___timeframe, limit=query), columns=tohlcv_column)
+    moving_average = pandas.DataFrame()
+    moving_average['timestamp'] = bitcoin["timestamp"]
+    moving_average['btc_close'] = bitcoin["close"]
+    moving_average['btc_MA'] = bitcoin["close"].rolling(window=50).mean()
+    return moving_average
+
+def swing_trade(i, klines):
+    if follow_btc_trend:
+        bitcoin = Moving_Average_of_Bitcoin()
+        klines  = pandas.merge_asof(klines, bitcoin, on='timestamp')
+
+    self_MA = Moving_Average(i)
+    klines  = pandas.merge_asof(klines, self_MA, on='timestamp')    
+    klines['high_s1'] = klines["high"].shift(1)
+    klines['high_s2'] = klines["high"].shift(2)
+    klines['low_s1'] = klines["low"].shift(1)
+    klines['low_s2'] = klines["low"].shift(2)
+
+    # Backtest trades
+    klines["GO_LONG"] = klines.apply(GO_LONG_CONDITION, axis=1)
+    klines["GO_SHORT"] = klines.apply(GO_SHORT_CONDITION, axis=1)
+    klines["EXIT_LONG"] = klines.apply(EXIT_LONG_CONDITION, axis=1)
+    klines["EXIT_SHORT"] = klines.apply(EXIT_SHORT_CONDITION, axis=1)
+    return klines
 
 def candle_color(klines):
     if klines['open'] > klines['close']: return "RED"
     elif klines['open'] < klines['close']: return "GREEN"
     else: return "INDECISIVE"
 
-def GO_LONG_CONDITION(klines, bitcoin):
-    if (klines['close'].iloc[-1] > klines['high'].iloc[-2] and klines['close'].iloc[-1] > klines['high'].iloc[-3]) and \
-        bitcoin['close'].iloc[-1] > bitcoin['Moving_Avg'].iloc[-1]: return True
-    else: return False
+def GO_LONG_CONDITION(klines):
+    if follow_btc_trend: return True if (klines['close'] > klines['high_s1'] and klines['close'] > klines['high_s2']) and klines['close'] > klines['MA'] and klines['btc_close'] > klines['btc_MA'] else False
+    else: return True if (klines['close'] > klines['high_s1'] and klines['close'] > klines['high_s2']) and klines['close'] > klines['MA'] else False
 
-def GO_SHORT_CONDITION(klines, bitcoin):
-    if (klines['close'].iloc[-1] < klines['low'].iloc[-2] and klines['close'].iloc[-1] < klines['low'].iloc[-3]) and \
-        bitcoin['close'].iloc[-1] < bitcoin['Moving_Avg'].iloc[-1]: return True
-    else: return False
+def GO_SHORT_CONDITION(klines):
+    if follow_btc_trend: return True if (klines['close'] < klines['low_s1'] and klines['close'] < klines['low_s2']) and klines['close'] < klines['MA'] and klines['btc_close'] < klines['btc_MA'] else False
+    else: return True if (klines['close'] < klines['low_s1'] and klines['close'] < klines['low_s2']) and klines['close'] < klines['MA'] else False
 
-def EXIT_LONG_CONDITION(klines, bitcoin):
-    if (klines['close'].iloc[-1] < klines['low'].iloc[-2] and klines['close'].iloc[-1] < klines['low'].iloc[-3]) or \
-        bitcoin['close'].iloc[-1] < bitcoin['Moving_Avg'].iloc[-1]: return True
-    else: return False
+def EXIT_LONG_CONDITION(klines):
+    if follow_btc_trend: return True if (klines['close'] < klines['low_s1'] and klines['close'] < klines['low_s2']) or klines['close'] < klines['MA'] or klines['btc_close'] < klines['btc_MA'] else False
+    else: return True if (klines['close'] < klines['low_s1'] and klines['close'] < klines['low_s2']) or klines['close'] < klines['MA'] else False
 
-def EXIT_SHORT_CONDITION(klines, bitcoin):
-    if (klines['close'].iloc[-1] > klines['high'].iloc[-2] and klines['close'].iloc[-1] > klines['high'].iloc[-3]) or \
-        bitcoin['close'].iloc[-1] > bitcoin['Moving_Avg'].iloc[-1]: return True
-    else: return False
-
-def test():
-    for i in range(len(config.coin)):
-        klines = klines_4HOUR(i)
-        bitcoin = Moving_Average_of_Bitcoin()
-        print("Go Long   : " + str(GO_LONG_CONDITION(klines, bitcoin)))
-        print("Go Short  : " + str(GO_SHORT_CONDITION(klines, bitcoin)))
-        print("Exit Long : " + str(EXIT_LONG_CONDITION(klines, bitcoin)))
-        print("Exit Short: " + str(EXIT_SHORT_CONDITION(klines, bitcoin)))
-        print()
-        print((klines['close'].iloc[-1] < klines['low'].iloc[-2] and klines['close'].iloc[-1] < klines['low'].iloc[-3]))
-        print(bitcoin['close'].iloc[-1] < bitcoin['Moving_Avg'].iloc[-1])
-# test()
+def EXIT_SHORT_CONDITION(klines):
+    if follow_btc_trend: return True if (klines['close'] > klines['high_s1'] and klines['close'] > klines['high_s2']) or klines['close'] > klines['MA'] or klines['btc_close'] > klines['btc_MA'] else False
+    else: return True if (klines['close'] > klines['high_s1'] and klines['close'] > klines['high_s2']) or klines['close'] > klines['MA'] else False
