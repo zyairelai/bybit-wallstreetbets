@@ -7,7 +7,7 @@ from termcolor import colored
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 def lets_make_some_money():
-    print("\n_Big_ Timeframe : " + retrieve_klines.big_timeframe)
+    print("_Big_ Timeframe : " + retrieve_klines.big_timeframe)
     print("Entry Timeframe : " + retrieve_klines.entry_timeframe + "\n")
 
     for i in range(len(config.coin)):
@@ -52,7 +52,7 @@ print(colored("LIVE TRADE IS ENABLED\n", "green")) if config.live_trade else pri
 try:
     if config.enable_scheduler:
         scheduler = BlockingScheduler()
-        scheduler.add_job(lets_make_some_money, 'cron', second='0')
+        scheduler.add_job(lets_make_some_money, 'cron', minute='1')
         scheduler.start()
     else: lets_make_some_money()
 
