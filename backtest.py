@@ -1,14 +1,17 @@
-import config, strategy
+import config
+import strategy
+import retrieve_klines
 from datetime import datetime
 
 def backtest():
-    print("\n_Big_ Timeframe : " + strategy.big_timeframe)
-    print("Entry Timeframe : " + strategy.entry_timeframe + "\n")
+    print("\n_Big_ Timeframe : " + retrieve_klines.big_timeframe)
+    print("Entry Timeframe : " + retrieve_klines.entry_timeframe + "\n")
 
     all_pairs = 0
     for i in range(len(config.coin)):
-        klines = strategy.retrieve_klines(i)
+        klines = retrieve_klines.retrieve_klines(i)
         swing_trades = strategy.swing_trade(i, klines)
+        print(swing_trades)
 
         print(config.pair[i])
         print("Start Time Since " + str(datetime.fromtimestamp(swing_trades["timestamp"].iloc[0]/1000)))

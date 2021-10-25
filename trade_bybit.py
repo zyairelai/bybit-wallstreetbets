@@ -1,18 +1,23 @@
 import api_bybit
-import config, strategy
+import config
+import strategy
+import retrieve_klines
 from datetime import datetime
 from termcolor import colored
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 def lets_make_some_money():
+    print("\n_Big_ Timeframe : " + retrieve_klines.big_timeframe)
+    print("Entry Timeframe : " + retrieve_klines.entry_timeframe + "\n")
+
     for i in range(len(config.coin)):
         print(config.pair[i])
-        klines = strategy.retrieve_klines(i)
+        klines = retrieve_klines.retrieve_klines(i)
         swing_trades = strategy.swing_trade(i, klines)
-        response = api_bybit.position_information(i)
         swing_trades = swing_trades.drop(['volume'], axis=1)
         # print(swing_trades)
 
+        response = api_bybit.position_information(i)
         if response[0].get('leverage') != config.leverage[i]: api_bybit.change_leverage(i)
         if response[1].get('leverage') != config.leverage[i]: api_bybit.change_leverage(i)
         if not response[0].get('is_isolated'): api_bybit.change_margin_to_ISOLATED(i)
