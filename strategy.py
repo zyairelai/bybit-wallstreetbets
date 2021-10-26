@@ -33,7 +33,7 @@ def GO_SHORT_CONDITION(klines):
     else: return False
 
 def EXIT_LONG_CONDITION(klines):
-    return True if klines['open'] < klines['low_s2'] and klines['open'] < klines['low_s3'] else False
+    return True if klines['open'] < klines['low_s2'] or klines['color'] == "RED" else False
 
 def EXIT_SHORT_CONDITION(klines):
-    return True if klines['open'] > klines['high_s2'] and klines['open'] > klines['high_s3'] else False
+    return True if klines['open'] > klines['high_s2'] or klines['color'] == "GREEN" else False
