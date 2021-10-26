@@ -11,7 +11,7 @@ def backtest():
     for i in range(len(config.coin)):
         klines = retrieve_klines.retrieve_klines(i)
         swing_trades = strategy.swing_trade(i, klines)
-        print(swing_trades)
+        # print(swing_trades)
 
         print(config.pair[i])
         print("Start Time Since " + str(datetime.fromtimestamp(swing_trades["timestamp"].iloc[0]/1000)))
@@ -38,7 +38,7 @@ def check_for_long(i, swing_trades):
         else:
             if swing_trades["EXIT_LONG"].iloc[index]:
                 position = False
-                realized_pnl = (swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]
+                realized_pnl = ((swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]) - (0.15 * config.leverage[i])
                 total_pnl = total_pnl + realized_pnl
 
     return round(total_pnl, 2)
@@ -55,7 +55,7 @@ def check_for_short(i, swing_trades):
         else:
             if swing_trades["EXIT_SHORT"].iloc[index]:
                 position = False
-                realized_pnl = (swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]
+                realized_pnl = ((swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]) - (0.15 * config.leverage[i])
                 total_pnl = total_pnl + realized_pnl
 
     return round(total_pnl, 2)

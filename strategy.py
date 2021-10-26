@@ -19,13 +19,21 @@ def swing_trade(i, klines):
     return klines
 
 def GO_LONG_CONDITION(klines):
-    return True if (klines['open'] > klines['high_s2'] and klines['open'] > klines['high_s3']) and klines['open'] > klines['MA'] else False
+    if  klines['open'] > klines['MA'] and \
+        klines['open'] > klines['high_s2'] and \
+        klines['open'] > klines['high_s3'] and \
+        klines['color'] == "GREEN": return True
+    else: return False
 
 def GO_SHORT_CONDITION(klines):
-    return True if (klines['open'] < klines['low_s2'] and klines['open'] < klines['low_s3']) and klines['open'] < klines['MA'] else False
+    if  klines['open'] < klines['MA'] and \
+        klines['open'] < klines['low_s2'] and \
+        klines['open'] < klines['low_s3'] and \
+        klines['color'] == "RED": return True
+    else: return False
 
 def EXIT_LONG_CONDITION(klines):
-    return True if (klines['open'] < klines['low_s2'] or klines['open'] < klines['low_s3']) else False
+    return True if klines['open'] < klines['low_s2'] and klines['open'] < klines['low_s3'] else False
 
 def EXIT_SHORT_CONDITION(klines):
-    return True if (klines['open'] > klines['high_s2'] or klines['open'] > klines['high_s3']) else False
+    return True if klines['open'] > klines['high_s2'] and klines['open'] > klines['high_s3'] else False
