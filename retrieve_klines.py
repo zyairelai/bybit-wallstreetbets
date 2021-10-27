@@ -2,7 +2,7 @@ import config
 import ccxt
 import pandas
 
-query = 100
+query = 200
 tohlcv_column = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
 big_timeframe   = '1d'
