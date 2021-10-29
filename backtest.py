@@ -36,7 +36,7 @@ def check_for_long(i, swing_trades):
                 position = True
                 entry_price = swing_trades['open'].iloc[index]
         else:
-            liquidation = (swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
+            liquidation = (swing_trades['low'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
             if swing_trades["EXIT_LONG"].iloc[index] or liquidation:
                 position = False
                 if liquidation: realized_pnl = -100
@@ -55,7 +55,7 @@ def check_for_short(i, swing_trades):
                 position = True
                 entry_price = swing_trades['open'].iloc[index]
         else:
-            liquidation = (swing_trades['open'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
+            liquidation = (swing_trades['high'].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
             if swing_trades["EXIT_SHORT"].iloc[index] or liquidation:
                 position = False
                 if liquidation: realized_pnl = -100
