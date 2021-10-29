@@ -3,7 +3,7 @@ import strategy
 import retrieve_klines
 from datetime import datetime
 
-fees = 0.15
+fees = 0.2
 
 def backtest():
     print("\n_Big_ Timeframe : " + retrieve_klines.big_timeframe)
@@ -92,8 +92,8 @@ def check_for_short(i, swing_trades):
     print("_Win Trades: " + str(wintrade))
     print("Lose Trades: " + str(losetrade))
     if (wintrade + losetrade > 1):
-        winrate = round(wintrade / (wintrade + losetrade) * 100, 2)
-        print("Winrate : " + str(winrate))
+        winrate = round(wintrade / (wintrade + losetrade) * 100)
+        print("Winrate : " + str(winrate) + " %")
     print()
     return round(total_pnl, 2)
 
