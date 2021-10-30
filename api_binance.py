@@ -59,13 +59,13 @@ def market_open_short(i):
     print(colored("💥 GO_SHORT 💥", "red"))
 
 def market_close_long(i, response):
-    # if live_trade:
-    client.futures_create_order(symbol=config.pair[i],
-                                quantity=abs(float(response[1].get('positionAmt'))),
-                                positionSide="LONG",
-                                side="SELL",
-                                type="MARKET",
-                                timestamp=get_timestamp())
+    if live_trade:
+        client.futures_create_order(symbol=config.pair[i],
+                                    quantity=abs(float(response[1].get('positionAmt'))),
+                                    positionSide="LONG",
+                                    side="SELL",
+                                    type="MARKET",
+                                    timestamp=get_timestamp())
     print("💰 CLOSE_LONG 💰")
 
 def market_close_short(i, response):
@@ -79,6 +79,3 @@ def market_close_short(i, response):
     print("💰 CLOSE_SHORT 💰")
 
 set_hedge_mode()
-
-# response = position_information(0)
-# market_close_long(0, response)
