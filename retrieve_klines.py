@@ -25,3 +25,6 @@ def candle_color(candle):
     if candle['close'] > candle['open']: return "GREEN"
     elif candle['close'] < candle['open']: return "RED"
     else: return "INDECISIVE"
+
+print("_Big_ Timeframe : " + big_timeframe)
+print("Entry Timeframe : " + entry_timeframe + "\n")

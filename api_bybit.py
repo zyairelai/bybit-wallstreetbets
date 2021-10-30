@@ -2,6 +2,7 @@ import os
 import time
 import bybit
 import config
+from termcolor import colored
 
 # Get environment variables
 api_key    = os.environ.get('BYBIT_KEY')
@@ -37,17 +38,45 @@ def disable_auto_add_margin(i):
     client.LinearPositions.LinearPositions_setAutoAddMargin(symbol=config.pair[i], side="Sell", auto_add_margin=False).result()
 
 def market_open_long(i):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=config.pair[i], side="Buy", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
+    if live_trade:
+        client.LinearOrder.LinearOrder_new(symbol=config.pair[i],
+                                           qty=config.quantity[i],
+                                           side="Buy",
+                                           order_type="Market",
+                                           time_in_force="ImmediateOrCancel",
+                                           reduce_only=False, 
+                                           close_on_trigger=False).result()
+    print(colored("🚀 GO_LONG 🚀", "green"))
 
 def market_open_short(i):
-    if live_trade: client.LinearOrder.LinearOrder_new(symbol=config.pair[i], side="Sell", qty=config.quantity[i], order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=False, close_on_trigger=False).result()
+    if live_trade:
+        client.LinearOrder.LinearOrder_new(symbol=config.pair[i],
+                                           qty=config.quantity[i],
+                                           side="Sell",
+                                           order_type="Market",
+                                           time_in_force="ImmediateOrCancel",
+                                           reduce_only=False,
+                                           close_on_trigger=False).result()
+    print(colored("💥 GO_SHORT 💥", "red"))
 
 def market_close_long(i, response):
     if live_trade:
-        positionAmt = response[0].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=config.pair[i], side="Sell", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
+        client.LinearOrder.LinearOrder_new(symbol=config.pair[i],
+                                           qty=response[0].get('size'),
+                                           side="Sell",
+                                           order_type="Market",
+                                           time_in_force="ImmediateOrCancel",
+                                           reduce_only=True,
+                                           close_on_trigger=False).result()
+    print("💰 CLOSE_LONG 💰")
 
 def market_close_short(i, response):
     if live_trade:
-        positionAmt = response[1].get('size')
-        client.LinearOrder.LinearOrder_new(symbol=config.pair[i], side="Buy", qty=positionAmt, order_type="Market", time_in_force="ImmediateOrCancel",reduce_only=True, close_on_trigger=False).result()
+        client.LinearOrder.LinearOrder_new(symbol=config.pair[i],
+                                           qty=response[1].get('size'),
+                                           side="Buy",
+                                           order_type="Market",
+                                           time_in_force="ImmediateOrCancel",
+                                           reduce_only=True,
+                                           close_on_trigger=False).result()
+    print("💰 CLOSE_SHORT 💰")
