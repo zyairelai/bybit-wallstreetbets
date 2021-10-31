@@ -6,6 +6,7 @@ query = 200
 exchange = ccxt.binance()
 tohlcv_column = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
+strategy = "open"
 big_timeframe   = '12h'
 entry_timeframe = '2h'
 
@@ -27,4 +28,5 @@ def candle_color(candle):
     else: return "INDECISIVE"
 
 print("_Big_ Timeframe : " + big_timeframe)
-print("Entry Timeframe : " + entry_timeframe + "\n")
+print("Entry Timeframe : " + entry_timeframe)
+print("Using  Strategy : " + strategy + "\n")

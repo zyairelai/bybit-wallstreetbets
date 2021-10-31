@@ -1,6 +1,7 @@
 import api_binance
 import config
-import strategy
+import strategy_open
+import strategy_close
 import retrieve_klines
 from termcolor import colored
 from datetime import datetime
@@ -11,7 +12,9 @@ def lets_make_some_money():
     for i in range(len(config.coin)):    
         print(config.pair[i])
         klines = retrieve_klines.retrieve_klines(i)
-        swing_trades = strategy.swing_trade(i, klines)
+
+        if retrieve_klines.strategy == "open": swing_trades = strategy_open.swing_trade(i, klines)
+        else: swing_trades = strategy_close.swing_trade(i, klines)
         swing_trades = swing_trades.drop(['volume'], axis=1)
         # print(swing_trades)
 

@@ -18,10 +18,10 @@ def position_information(i):
 
 def LONG_SIDE(response):
     if float(response[1].get('positionAmt')) > 0: return "LONGING"
-    elif float(response[2].get('positionAmt')) == 0: return "NO_POSITION"
+    elif float(response[1].get('positionAmt')) == 0: return "NO_POSITION"
 
 def SHORT_SIDE(response):
-    if float(response[1].get('positionAmt')) > 0 : return "SHORTING"
+    if float(response[2].get('positionAmt')) < 0 : return "SHORTING"
     elif float(response[2].get('positionAmt')) == 0: return "NO_POSITION"
 
 def change_leverage(i):
