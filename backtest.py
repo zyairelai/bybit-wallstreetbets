@@ -1,18 +1,18 @@
 import config
 import strategy_open
 import strategy_close
+import strategy_turtle
 import retrieve_klines
 from datetime import datetime
 
 fees = 0.2
+strategy = strategy_open
 
 def backtest():
     all_pairs = 0
     for i in range(len(config.coin)):
         klines = retrieve_klines.retrieve_klines(i)
-
-        if retrieve_klines.strategy == "open": swing_trades = strategy_open.swing_trade(i, klines)
-        else: swing_trades = strategy_close.swing_trade(i, klines)
+        swing_trades = strategy.swing_trade(i, klines)
         # print(swing_trades)
 
         print("\n\n" + config.pair[i])
@@ -41,10 +41,11 @@ def check_PNL(i, swing_trades, positionSide):
         liq_indicator = "high"
 
     for index in range(len(swing_trades)):
+        entry_exit_indicator = 'open' if strategy == strategy_open else 'close'
         if not position:
             if swing_trades[open_position].iloc[index]:
                 position = True
-                entry_price = swing_trades[retrieve_klines.strategy].iloc[index]
+                entry_price = swing_trades[entry_exit_indicator].iloc[index]
         else:
             liquidation = (swing_trades[liq_indicator].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
             if swing_trades[exit_position].iloc[index] or liquidation:
@@ -52,8 +53,8 @@ def check_PNL(i, swing_trades, positionSide):
                 if liquidation:
                     realized_pnl = -100
                     total_liq = total_liq + 1
-                else : realized_pnl = ((swing_trades[retrieve_klines.strategy].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]) - (fees * config.leverage[i])
-                
+                else : realized_pnl = ((swing_trades[entry_exit_indicator].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]) - (fees * config.leverage[i])
+
                 if realized_pnl > fees * config.leverage[i]: wintrade = wintrade + 1
                 else: losetrade = losetrade + 1
 

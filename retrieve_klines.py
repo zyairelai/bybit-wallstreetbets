@@ -2,11 +2,10 @@ import config
 import ccxt
 import pandas
 
-query = 200
+query = 80
 exchange = ccxt.binance()
 tohlcv_column = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
-strategy = "open"
 big_timeframe   = '12h'
 entry_timeframe = '2h'
 
@@ -29,4 +28,3 @@ def candle_color(candle):
 
 print("_Big_ Timeframe : " + big_timeframe)
 print("Entry Timeframe : " + entry_timeframe)
-print("Using  Strategy : " + strategy + "\n")
