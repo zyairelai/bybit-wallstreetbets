@@ -1,8 +1,8 @@
 import pandas
-import retrieve_klines
+import get_klines
 
 def swing_trade(i, klines):
-    self_MA = retrieve_klines.Moving_Average(i)
+    self_MA = get_klines.Moving_Average(i)
     klines = pandas.merge_asof(klines, self_MA, on='timestamp')
     klines['high_s2'] = klines["high"].shift(2)
     klines['high_s3'] = klines["high"].shift(3)

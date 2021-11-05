@@ -1,8 +1,8 @@
 live_trade = False
 enable_scheduler = False
 
-coin = ["BTC", "ETH", "BNB", "BCH", "LTC", "XRP"]
-quantity = [0.001, 0.01, 0.05, 0.05, 0.15, 30]
+coin = ["BTC", "ETH", "BNB", "BCH", "LTC"]
+quantity = [0.001, 0.01, 0.05, 0.05, 0.15]
 
 leverage, pair = [], []
 for i in range(len(coin)):

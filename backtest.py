@@ -1,31 +1,34 @@
 import config
-import strategy_open
-import strategy_close
-import strategy_turtle
-import retrieve_klines
+import get_klines
 from datetime import datetime
 
+import strategy
+strategy = strategy
+
 fees = 0.2
-strategy = strategy_open
+entry_exit_indicator = 'close'
 
 def backtest():
     all_pairs = 0
-    for i in range(len(config.coin)):
-        klines = retrieve_klines.retrieve_klines(i)
+    for i in range(len(config.pair)):
+        pair = config.pair[i]
+        leverage = config.leverage[i]
+
+        klines = get_klines.get_klines(pair)
         swing_trades = strategy.swing_trade(i, klines)
         # print(swing_trades)
 
-        print("\n\n" + config.pair[i])
+        print("\n\n" + pair)
         print("Start Time Since " + str(datetime.fromtimestamp(swing_trades["timestamp"].iloc[0]/1000)))
-        long_result = round(check_PNL(i, swing_trades, "_LONG"), 2)
-        short_reult = round(check_PNL(i, swing_trades, "SHORT"), 2)
+        long_result = round(check_PNL(swing_trades, leverage, "_LONG"), 2)
+        short_reult = round(check_PNL(swing_trades, leverage, "SHORT"), 2)
         overall_result = round(long_result + short_reult, 2)
         all_pairs = round(all_pairs + overall_result, 2)
 
         print("PNL for _BOTH Positions: " + str(overall_result) + "%\n")
     print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
 
-def check_PNL(i, swing_trades, positionSide):
+def check_PNL(swing_trades, leverage, positionSide):
     position = False
     total_pnl, total_trades, total_liq = 0, 0, 0
     wintrade, losetrade = 0, 0
@@ -41,21 +44,20 @@ def check_PNL(i, swing_trades, positionSide):
         liq_indicator = "high"
 
     for index in range(len(swing_trades)):
-        entry_exit_indicator = 'open' if strategy == strategy_open else 'close'
         if not position:
             if swing_trades[open_position].iloc[index]:
                 position = True
                 entry_price = swing_trades[entry_exit_indicator].iloc[index]
         else:
-            liquidation = (swing_trades[liq_indicator].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i] < -80
+            liquidation = (swing_trades[liq_indicator].iloc[index] - entry_price) / entry_price * 100 * leverage < -80
             if swing_trades[exit_position].iloc[index] or liquidation:
                 position = False
                 if liquidation:
                     realized_pnl = -100
                     total_liq = total_liq + 1
-                else : realized_pnl = ((swing_trades[entry_exit_indicator].iloc[index] - entry_price) / entry_price * 100 * config.leverage[i]) - (fees * config.leverage[i])
+                else : realized_pnl = ((swing_trades[entry_exit_indicator].iloc[index] - entry_price) / entry_price * 100 * leverage) - (fees * leverage)
 
-                if realized_pnl > fees * config.leverage[i]: wintrade = wintrade + 1
+                if realized_pnl > 0: wintrade = wintrade + 1
                 else: losetrade = losetrade + 1
 
                 total_trades = total_trades + 1

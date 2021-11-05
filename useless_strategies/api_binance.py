@@ -13,8 +13,8 @@ live_trade  = config.live_trade
 def get_timestamp():
     return int(time.time() * 1000)
 
-def position_information(i):
-    return client.futures_position_information(symbol=config.pair[i], timestamp=get_timestamp())
+def position_information(pair):
+    return client.futures_position_information(symbol=pair, timestamp=get_timestamp())
 
 def LONG_SIDE(response):
     if float(response[1].get('positionAmt')) > 0: return "LONGING"
@@ -24,11 +24,11 @@ def SHORT_SIDE(response):
     if float(response[2].get('positionAmt')) < 0 : return "SHORTING"
     elif float(response[2].get('positionAmt')) == 0: return "NO_POSITION"
 
-def change_leverage(i):
-    return client.futures_change_leverage(symbol=config.pair[i], leverage=config.leverage[i], timestamp=get_timestamp())
+def change_leverage(pair, leverage):
+    return client.futures_change_leverage(symbol=pair, leverage=leverage, timestamp=get_timestamp())
 
-def change_margin_to_ISOLATED(i):
-    return client.futures_change_margin_type(symbol=config.pair[i], marginType="ISOLATED", timestamp=get_timestamp())
+def change_margin_to_ISOLATED(pair):
+    return client.futures_change_margin_type(symbol=pair, marginType="ISOLATED", timestamp=get_timestamp())
 
 def set_one_way_mode():
     if client.futures_get_position_mode(timestamp=get_timestamp()).get('dualSidePosition'):
@@ -38,29 +38,29 @@ def set_hedge_mode():
     if not client.futures_get_position_mode(timestamp=get_timestamp()).get('dualSidePosition'):
         return client.futures_change_position_mode(dualSidePosition="true", timestamp=get_timestamp())
 
-def market_open_long(i):
+def market_open_long(pair, quantity):
     if live_trade:
-        client.futures_create_order(symbol=config.pair[i],
-                                    quantity=config.quantity[i],
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
                                     positionSide="LONG",
                                     type="MARKET",
                                     side="BUY",
                                     timestamp=get_timestamp())
     print(colored("🚀 GO_LONG 🚀", "green"))
 
-def market_open_short(i):
+def market_open_short(pair, quantity):
     if live_trade:
-        client.futures_create_order(symbol=config.pair[i],
-                                    quantity=config.quantity[i],
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
                                     positionSide="SHORT",
                                     type="MARKET",
                                     side="SELL",
                                     timestamp=get_timestamp())
     print(colored("💥 GO_SHORT 💥", "red"))
 
-def market_close_long(i, response):
+def market_close_long(pair, response):
     if live_trade:
-        client.futures_create_order(symbol=config.pair[i],
+        client.futures_create_order(symbol=pair,
                                     quantity=abs(float(response[1].get('positionAmt'))),
                                     positionSide="LONG",
                                     side="SELL",
@@ -68,9 +68,9 @@ def market_close_long(i, response):
                                     timestamp=get_timestamp())
     print("💰 CLOSE_LONG 💰")
 
-def market_close_short(i, response):
+def market_close_short(pair, response):
     if live_trade:
-        client.futures_create_order(symbol=config.pair[i],
+        client.futures_create_order(symbol=pair,
                                     quantity=abs(float(response[2].get('positionAmt'))),
                                     positionSide="SHORT",
                                     side="BUY",
