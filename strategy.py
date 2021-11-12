@@ -1,43 +1,38 @@
 import pandas
-import get_klines
+import modules.candlestick
+import modules.heikin_ashi
 
-def swing_trade(pair, klines):
-    trend = get_klines.trend(pair)
-    klines = pandas.merge_asof(klines, trend, on='timestamp')
+test_module = False
 
-    entry = get_klines.entry(pair)
-    klines = pandas.merge_asof(klines, entry, on='timestamp')
+def swing_trade(pair):
+    # Fetch the raw klines data
+    get_raw = modules.candlestick.get_klines(pair, '1h')
+
+    # Process Heikin Ashi & Apply Technical Analysis
+    candlestick = modules.candlestick.candlestick(get_raw)[["timestamp", "open", "high", "low", "close", "volume", "volumeAvg", "color"]].copy()
+    heikin_ashi = modules.heikin_ashi.heikin_ashi(get_raw)[["timestamp", "candle"]].copy()
+    candlestick = candlestick.rename(columns={'color': 'candlestick'})
+    heikin_ashi = heikin_ashi.rename(columns={'candle': 'heikin_ashi'})
     
-    # Backtest trades
-    klines["GO_LONG"] = klines.apply(GO_LONG_CONDITION, axis=1)
-    klines["GO_SHORT"] = klines.apply(GO_SHORT_CONDITION, axis=1)
-    klines["EXIT_LONG"] = klines.apply(EXIT_LONG_CONDITION, axis=1)
-    klines["EXIT_SHORT"] = klines.apply(EXIT_SHORT_CONDITION, axis=1)
-
-    return klines
+    dataset = pandas.merge_asof(candlestick, heikin_ashi, on='timestamp')
+    dataset["GO_LONG"] = dataset.apply(GO_LONG_CONDITION, axis=1)
+    dataset["GO_SHORT"] = dataset.apply(GO_SHORT_CONDITION, axis=1)
+    return dataset
 
 def GO_LONG_CONDITION(klines):
-    if  klines['trend'] == "uptrend" and \
-        klines['8_EMA']  > klines['13_EMA'] and \
-        klines['13_EMA'] > klines['21_EMA'] and \
-        klines['Histogram'] > 0 : return True
+    color = "GREEN"
+    if  klines['candlestick'] == color and \
+        klines['heikin_ashi'] == color and \
+        klines['volume'] > klines["volumeAvg"]: return True
     else: return False
 
 def GO_SHORT_CONDITION(klines):
-    if  klines['trend'] == "downtrend" and \
-        klines['8_EMA']  < klines['13_EMA'] and \
-        klines['13_EMA'] < klines['21_EMA'] and \
-        klines['Histogram'] < 0 : return True
+    color = "RED"
+    if  klines['candlestick'] == color and \
+        klines['heikin_ashi'] == color and \
+        klines['volume'] > klines["volumeAvg"]: return True
     else: return False
 
-def EXIT_LONG_CONDITION(klines):
-    if  klines['8_EMA']  < klines['13_EMA'] and \
-        klines['13_EMA'] < klines['21_EMA'] and \
-        klines['Histogram'] < 0 : return True
-    else: return False
-
-def EXIT_SHORT_CONDITION(klines):
-    if  klines['8_EMA']  > klines['13_EMA'] and \
-        klines['13_EMA'] > klines['21_EMA'] and \
-        klines['Histogram'] > 0 : return True
-    else: return False
+if test_module:
+    run = swing_trade("BTCUSDT")
+    print(run)

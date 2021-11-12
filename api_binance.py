@@ -1,6 +1,4 @@
-import os
-import time
-import config
+import os, time, config
 from binance.client import Client
 from termcolor import colored
 
@@ -16,6 +14,9 @@ def get_timestamp():
 def position_information(pair):
     return client.futures_position_information(symbol=pair, timestamp=get_timestamp())
 
+def account_trades(pair, timestamp) :
+    return client.futures_account_trades(symbol=pair, timestamp=get_timestamp(), startTime=timestamp)
+
 def LONG_SIDE(response):
     if float(response[1].get('positionAmt')) > 0: return "LONGING"
     elif float(response[1].get('positionAmt')) == 0: return "NO_POSITION"
@@ -29,10 +30,6 @@ def change_leverage(pair, leverage):
 
 def change_margin_to_ISOLATED(pair):
     return client.futures_change_margin_type(symbol=pair, marginType="ISOLATED", timestamp=get_timestamp())
-
-def set_one_way_mode():
-    if client.futures_get_position_mode(timestamp=get_timestamp()).get('dualSidePosition'):
-        return client.futures_change_position_mode(dualSidePosition="false", timestamp=get_timestamp())
 
 def set_hedge_mode(): 
     if not client.futures_get_position_mode(timestamp=get_timestamp()).get('dualSidePosition'):
@@ -79,3 +76,39 @@ def market_close_short(pair, response):
     print("💰 CLOSE_SHORT 💰")
 
 set_hedge_mode()
+
+def trailing_open_long(pair, quantity, callbackRate):
+    if live_trade:
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
+                                    positionSide="LONG",
+                                    type="MARKET",
+                                    side="BUY",
+                                    timestamp=get_timestamp())
+
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
+                                    positionSide="LONG",
+                                    type="TRAILING_STOP_MARKET",
+                                    side="SELL",
+                                    callbackRate=callbackRate,
+                                    timestamp=get_timestamp())
+    print(colored("🚀 GO_LONG 🚀", "green"))
+
+def trailing_open_short(pair, quantity, callbackRate):
+    if live_trade:
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
+                                    positionSide="SHORT",
+                                    type="MARKET",
+                                    side="SELL",
+                                    timestamp=get_timestamp())
+
+        client.futures_create_order(symbol=pair,
+                                    quantity=quantity,
+                                    positionSide="SHORT",
+                                    type="TRAILING_STOP_MARKET",
+                                    side="BUY",
+                                    callbackRate=callbackRate,
+                                    timestamp=get_timestamp())
+    print(colored("💥 GO_SHORT 💥", "red"))

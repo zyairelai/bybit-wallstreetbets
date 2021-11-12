@@ -1,27 +1,23 @@
 import config
-import get_klines
+import strategy
 from datetime import datetime
 
-import strategy
 strategy = strategy
 
 fees = 0.2
-entry_exit_indicator = 'close'
 
 def backtest():
     all_pairs = 0
     for i in range(len(config.pair)):
-        pair = config.pair[i]
+        pair     = config.pair[i]
         leverage = config.leverage[i]
-
-        klines = get_klines.get_klines(pair)
-        swing_trades = strategy.swing_trade(i, klines)
-        # print(swing_trades)
+        long_term_low_leverage = strategy.swing_trade(pair)
+        # print(long_term_low_leverage)
 
         print("\n\n" + pair)
-        print("Start Time Since " + str(datetime.fromtimestamp(swing_trades["timestamp"].iloc[0]/1000)))
-        long_result = round(check_PNL(swing_trades, leverage, "_LONG"), 2)
-        short_reult = round(check_PNL(swing_trades, leverage, "SHORT"), 2)
+        print("Start Time Since " + str(datetime.fromtimestamp(long_term_low_leverage["timestamp"].iloc[0]/1000)))
+        long_result = round(check_PNL(long_term_low_leverage, leverage, "_LONG"), 2)
+        short_reult = round(check_PNL(long_term_low_leverage, leverage, "SHORT"), 2)
         overall_result = round(long_result + short_reult, 2)
         all_pairs = round(all_pairs + overall_result, 2)
 
@@ -35,27 +31,27 @@ def check_PNL(swing_trades, leverage, positionSide):
 
     if positionSide == "_LONG":
         open_position = "GO_LONG"
-        exit_position = "EXIT_LONG"
+        entry_indicat = "high"
         liq_indicator = "low"
 
     elif positionSide == "SHORT":
         open_position = "GO_SHORT"
-        exit_position = "EXIT_SHORT"
+        entry_indicat = "low"
         liq_indicator = "high"
 
     for index in range(len(swing_trades)):
         if not position:
             if swing_trades[open_position].iloc[index]:
                 position = True
-                entry_price = swing_trades[entry_exit_indicator].iloc[index]
+                entry_price = swing_trades["close"].iloc[index]
         else:
-            liquidation = (swing_trades[liq_indicator].iloc[index] - entry_price) / entry_price * 100 * leverage < -80
+            trailing_stop = (swing_trades[liq_indicator].iloc[index] - entry_indicat) / entry_indicat * 100 * leverage < -leverage
             if swing_trades[exit_position].iloc[index] or liquidation:
                 position = False
                 if liquidation:
                     realized_pnl = -100
                     total_liq = total_liq + 1
-                else : realized_pnl = ((swing_trades[entry_exit_indicator].iloc[index] - entry_price) / entry_price * 100 * leverage) - (fees * leverage)
+                else : realized_pnl = ((swing_trades["close"].iloc[index] - entry_price) / entry_price * 100 * leverage) - (fees * leverage)
 
                 if realized_pnl > 0: wintrade = wintrade + 1
                 else: losetrade = losetrade + 1

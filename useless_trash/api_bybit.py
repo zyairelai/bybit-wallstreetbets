@@ -16,6 +16,8 @@ def get_timestamp(recent):
 def position_information(pair):
     return client.LinearPositions.LinearPositions_myPosition(symbol=pair).result()[0].get('result')#[0_or_1].get('symbol')
 
+print(position_information("BTCUSDT")[0])
+
 def LONG_SIDE(response):
     if response[0].get('size') > 0: return "LONGING"
     elif response[0].get('size') == 0: return "NO_POSITION"
@@ -80,3 +82,10 @@ def market_close_short(pair, response):
                                            reduce_only=True,
                                            close_on_trigger=False).result()
     print("💰 CLOSE_SHORT 💰")
+
+def test_trailing_stop(pair, quantity):
+        client.Positions.Positions_tradingStop(symbol="BTCUSD",
+                                               take_profit="0",
+                                               stop_loss="9110",
+                                               trailing_stop="0",
+                                               new_trailing_active="0").result()
