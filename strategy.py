@@ -34,5 +34,5 @@ def GO_SHORT_CONDITION(klines):
     else: return False
 
 if test_module:
-    run = swing_trade("BTCUSDT")
+    run = swing_trade(("ETH" + "USDT").upper())
     print(run)

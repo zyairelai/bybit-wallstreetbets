@@ -1,5 +1,7 @@
+import feda
 import config
 import strategy
+import pandas, os
 from datetime import datetime
 
 strategy = strategy
@@ -11,20 +13,30 @@ def backtest():
     for i in range(len(config.pair)):
         pair     = config.pair[i]
         leverage = config.leverage[i]
-        long_term_low_leverage = strategy.swing_trade(pair)
-        # print(long_term_low_leverage)
+        long_term_low_leverage = strategy.swing_trade(pair)[["timestamp", "high", "low", "close", "volume", "volumeAvg", "GO_LONG", "GO_SHORT"]].copy()
+        print(long_term_low_leverage)
+
+        feda_klines = "feda_output.json"
+        test_data = pandas.read_json(feda_klines).rename({0: 'timestamp', 1: 'o', 2: 'h', 3: 'l', 4: 'c', 5: 'v'}, axis=1) 
+        dataset = pandas.merge_asof(test_data, long_term_low_leverage, on='timestamp')
+        dataset.drop('o', axis=1, inplace=True)
+        print(dataset)
 
         print("\n\n" + pair)
         print("Start Time Since " + str(datetime.fromtimestamp(long_term_low_leverage["timestamp"].iloc[0]/1000)))
-        long_result = round(check_PNL(long_term_low_leverage, leverage, "_LONG"), 2)
-        short_reult = round(check_PNL(long_term_low_leverage, leverage, "SHORT"), 2)
-        overall_result = round(long_result + short_reult, 2)
-        all_pairs = round(all_pairs + overall_result, 2)
 
-        print("PNL for _BOTH Positions: " + str(overall_result) + "%\n")
-    print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
+    #     long_result = round(check_PNL(long_term_low_leverage, leverage, "_LONG"), 2)
+    #     short_reult = round(check_PNL(long_term_low_leverage, leverage, "SHORT"), 2)
+    #     overall_result = round(long_result + short_reult, 2)
+    #     all_pairs = round(all_pairs + overall_result, 2)
+
+    #     print("PNL for _BOTH Positions: " + str(overall_result) + "%\n")
+    # print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
+    os.remove(feda_klines)
+
 
 def check_PNL(swing_trades, leverage, positionSide):
+
     position = False
     total_pnl, total_trades, total_liq = 0, 0, 0
     wintrade, losetrade = 0, 0

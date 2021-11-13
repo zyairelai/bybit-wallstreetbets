@@ -1,7 +1,7 @@
 import ccxt
 import pandas
 
-query = 60
+query = 1000
 ccxt_client = ccxt.binance()
 tohlcv_colume = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
