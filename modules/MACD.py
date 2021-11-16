@@ -1,3 +1,5 @@
+MACD_threshold = 50
+
 def apply_default(dataset):
     dataset['12_EMA'] = dataset['close'].ewm(span=12).mean()
     dataset['26_EMA'] = dataset['close'].ewm(span=26).mean()
@@ -11,15 +13,13 @@ def apply_default(dataset):
     return clean
 
 def long_condition(dataset):
-    if  dataset['Signal'] < 0 and \
-        dataset['Signal'] < dataset['MACD'] and \
+    if  dataset['Signal'] < MACD_threshold and \
         dataset['Histogram'] > 0 : return True 
     else: return False
 
 def short_condition(dataset):
-    if  dataset['Signal'] > 0 and \
-        dataset['Signal'] > dataset['MACD'] and \
-        dataset['Histogram'] < 0 : return True  
+    if  dataset['Signal'] > -MACD_threshold and \
+        dataset['Histogram'] < 0 : return True
     else: return False
 
 def test_module():

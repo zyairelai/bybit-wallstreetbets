@@ -6,8 +6,8 @@ test_module = True
 
 def swing_trade(pair):
     # Fetch the raw klines data
-    main_raw = modules.candlestick.get_klines(pair, '6h')
-    support  = modules.candlestick.get_klines(pair, '1h')
+    main_raw = modules.candlestick.get_klines(pair, '12h')
+    support  = modules.candlestick.get_klines(pair, '2h')
 
     # Process Heikin Ashi & Apply Technical Analysis
     main_candle = modules.candlestick.candlestick(main_raw)[["timestamp", "open", "high", "low", "close", "volume", "volumeAvg"]].copy()
