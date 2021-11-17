@@ -73,7 +73,6 @@ api_secret  = "your_bybit_secret_key"
 ### 2. PIP3 REQUIREMENTS
 You need to have these libraries installed:
 ```
-pip3 install APScheduler==3.6.3
 pip3 install Bybit==0.2.12
 pip3 install cryptography==3.3.2
 pip3 install pandas==1.2.4
@@ -89,7 +88,6 @@ The settings can be configured in `config.py`.
 | Variables           | Description                                                                                                |
 | --------------------| -----------------------------------------------------------------------------------------------------------|
 | `live_trade`        |`True` to place actual order <br /> `False` to see sample output                                            |
-| `enable_scheduler`  |`True` to loop the code everytime when the minute hits 0 and 30, which means twice in one hour              |
 | `market_order`      |`True` to use market order <br /> `False` to use limit order                                                |
 | `coin`              | You can put your coin list here                                                                            |
 | `quantity`          | Amount of the trade amount you want to trade                                                               |
@@ -97,9 +95,6 @@ The settings can be configured in `config.py`.
 
 <a name="run"></a>
 ### 4. RUN
-If you want to time this script by your own, set `enable_scheduler = False` then you can make your own scheduler
-
-Else, you can set `enable_scheduler = True` and the script will loop the program for you every 30 minutes.
 
 Now if you are all ready, set `live_trade = True` and ...
 

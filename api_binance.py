@@ -25,6 +25,9 @@ def SHORT_SIDE(response):
     if float(response[2].get('positionAmt')) < 0 : return "SHORTING"
     elif float(response[2].get('positionAmt')) == 0: return "NO_POSITION"
 
+def cancel_all_open_orders(pair):
+    return client.futures_cancel_all_open_orders(symbol=pair, timestamp=get_timestamp())
+
 def change_leverage(pair, leverage):
     return client.futures_change_leverage(symbol=pair, leverage=leverage, timestamp=get_timestamp())
 

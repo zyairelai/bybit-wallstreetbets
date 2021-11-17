@@ -1,42 +1,87 @@
-import pandas
 import modules.candlestick
-import modules.heikin_ashi
 
-test_module = True
+test_module = False
 
 def swing_trade(pair):
     # Fetch the raw klines data
-    main_raw = modules.candlestick.get_klines(pair, '12h')
-    support  = modules.candlestick.get_klines(pair, '2h')
+    dataset = modules.candlestick.get_klines(pair, '1h')
 
-    # Process Heikin Ashi & Apply Technical Analysis
-    main_candle = modules.candlestick.candlestick(main_raw)[["timestamp", "open", "high", "low", "close", "volume", "volumeAvg"]].copy()
-    ha_6_hours  = modules.heikin_ashi.heikin_ashi(main_raw)[["timestamp", "candle"]].copy()
-    ha_6_hours  = ha_6_hours.rename(columns={'candle': 'HA_6hour'})
-    ha_1_hours  = modules.heikin_ashi.heikin_ashi(support)[["timestamp", "candle"]].copy()
-    ha_1_hours  = ha_1_hours.rename(columns={'candle': 'HA_1hour'})
+    # Temporary Previous 7 days HIGH
+    dataset["high_1"] = dataset['high'].shift(1)
+    dataset["high_2"] = dataset['high'].shift(2)
+    dataset["high_3"] = dataset['high'].shift(3)
+    dataset["high_4"] = dataset['high'].shift(4)
+    dataset["high_5"] = dataset['high'].shift(5)
+    dataset["high_6"] = dataset['high'].shift(6)
+    dataset["high_7"] = dataset['high'].shift(7)
+    dataset["high_8"] = dataset['high'].shift(8)
 
-    dataset = pandas.merge_asof(main_candle, ha_6_hours, on='timestamp')
-    dataset = pandas.merge_asof(ha_1_hours, dataset, on='timestamp')
+    # Temporary Previous 7 days LOW
+    dataset["low_1"] = dataset['low'].shift(1)
+    dataset["low_2"] = dataset['low'].shift(2)
+    dataset["low_3"] = dataset['low'].shift(3)
+    dataset["low_4"] = dataset['low'].shift(4)
+    dataset["low_5"] = dataset['low'].shift(5)
+    dataset["low_6"] = dataset['low'].shift(6)
+    dataset["low_7"] = dataset['low'].shift(7)
+    dataset["low_8"] = dataset['low'].shift(8)
 
+    # Moving Average Trend Line
+    moving_average_threshold = 200
+    dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
+    dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
+
+    # Apply Place Order Condition
     dataset["GO_LONG"] = dataset.apply(GO_LONG_CONDITION, axis=1)
     dataset["GO_SHORT"] = dataset.apply(GO_SHORT_CONDITION, axis=1)
+    dataset["EXIT_LONG"] = dataset.apply(EXIT_LONG_CONDITION, axis=1)
+    dataset["EXIT_SHORT"] = dataset.apply(EXIT_SHORT_CONDITION, axis=1)
     return dataset
 
-def GO_LONG_CONDITION(klines):
-    color = "GREEN"
-    if  klines['HA_6hour'] == color and \
-        klines['HA_1hour'] == color and \
-        klines['volume'] > klines["volumeAvg"]: return True
+indicator = "open"
+
+def GO_LONG_CONDITION(dataset):
+    if  dataset[indicator] < dataset["low_8"] and \
+        dataset[indicator] < dataset["low_2"] and \
+        dataset[indicator] < dataset["low_3"] and \
+        dataset[indicator] < dataset["low_4"] and \
+        dataset[indicator] < dataset["low_5"] and \
+        dataset[indicator] < dataset["low_6"] and \
+        dataset[indicator] < dataset["low_7"] and \
+        dataset[indicator] > dataset['EMA'] : return True
     else: return False
 
-def GO_SHORT_CONDITION(klines):
-    color = "RED"
-    if  klines['HA_6hour'] == color and \
-        klines['HA_1hour'] == color and \
-        klines['volume'] > klines["volumeAvg"]: return True
+def GO_SHORT_CONDITION(dataset):
+    if  dataset[indicator] > dataset["high_8"] and \
+        dataset[indicator] > dataset["high_2"] and \
+        dataset[indicator] > dataset["high_3"] and \
+        dataset[indicator] > dataset["high_4"] and \
+        dataset[indicator] > dataset["high_5"] and \
+        dataset[indicator] > dataset["high_6"] and \
+        dataset[indicator] > dataset["high_7"] and \
+        dataset[indicator] < dataset['EMA'] : return True
+    else: return False
+
+def EXIT_LONG_CONDITION(dataset):
+    if  dataset[indicator] > dataset["high_8"] and \
+        dataset[indicator] > dataset["high_2"] and \
+        dataset[indicator] > dataset["high_3"] and \
+        dataset[indicator] > dataset["high_4"] and \
+        dataset[indicator] > dataset["high_5"] and \
+        dataset[indicator] > dataset["high_6"] and \
+        dataset[indicator] > dataset["high_7"] : return True
+    else: return False
+
+def EXIT_SHORT_CONDITION(dataset):
+    if  dataset[indicator] < dataset["low_8"] and \
+        dataset[indicator] < dataset["low_2"] and \
+        dataset[indicator] < dataset["low_3"] and \
+        dataset[indicator] < dataset["low_4"] and \
+        dataset[indicator] < dataset["low_5"] and \
+        dataset[indicator] < dataset["low_6"] and \
+        dataset[indicator] < dataset["low_7"] : return True
     else: return False
 
 if test_module:
-    run = swing_trade(("ETH" + "USDT").upper())
-    print(run)
+    long_term_low_leverage = swing_trade("BTCUSDT")
+    print(long_term_low_leverage)

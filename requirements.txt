@@ -1,4 +1,3 @@
-APScheduler
 bybit
 ccxt
 pandas
