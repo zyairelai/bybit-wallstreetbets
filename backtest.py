@@ -39,11 +39,11 @@ def check_PNL(hero, leverage, positionSide):
     for i in range(len(hero)):
         if not position:
             if hero[open_position].iloc[i]:
-                entry_price = hero['close'].iloc[i]
+                entry_price = hero['open'].iloc[i]
                 position = True
         else:
             liquidated = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -80
-            unrealizedPNL = (hero['close'].iloc[i] - entry_price) / entry_price * 100 * leverage
+            unrealizedPNL = (hero['open'].iloc[i] - entry_price) / entry_price * 100 * leverage
             breakeven_PNL = fees * leverage
 
             if (hero[exit_position].iloc[i]) or liquidated:

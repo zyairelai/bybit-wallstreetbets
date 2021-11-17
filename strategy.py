@@ -27,7 +27,7 @@ def swing_trade(pair):
     dataset["low_8"] = dataset['low'].shift(8)
 
     # Moving Average Trend Line
-    moving_average_threshold = 200
+    moving_average_threshold = 50
     dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
     dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
 
@@ -39,6 +39,8 @@ def swing_trade(pair):
     return dataset
 
 indicator = "open"
+moving_average = "EMA"
+# dataset[indicator] < dataset[moving_average]
 
 def GO_LONG_CONDITION(dataset):
     if  dataset[indicator] < dataset["low_8"] and \
@@ -47,8 +49,7 @@ def GO_LONG_CONDITION(dataset):
         dataset[indicator] < dataset["low_4"] and \
         dataset[indicator] < dataset["low_5"] and \
         dataset[indicator] < dataset["low_6"] and \
-        dataset[indicator] < dataset["low_7"] and \
-        dataset[indicator] > dataset['EMA'] : return True
+        dataset[indicator] < dataset["low_7"] : return True
     else: return False
 
 def GO_SHORT_CONDITION(dataset):
@@ -58,8 +59,7 @@ def GO_SHORT_CONDITION(dataset):
         dataset[indicator] > dataset["high_4"] and \
         dataset[indicator] > dataset["high_5"] and \
         dataset[indicator] > dataset["high_6"] and \
-        dataset[indicator] > dataset["high_7"] and \
-        dataset[indicator] < dataset['EMA'] : return True
+        dataset[indicator] > dataset["high_7"] : return True
     else: return False
 
 def EXIT_LONG_CONDITION(dataset):
