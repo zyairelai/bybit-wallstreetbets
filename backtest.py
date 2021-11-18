@@ -2,7 +2,9 @@ import config
 import strategy
 from datetime import datetime
 
-fees = 0.1
+fees = 0.2
+use_trailing = True
+callbackrate = 2
 
 def backtest():
     all_pairs = 0
@@ -42,13 +44,17 @@ def check_PNL(hero, leverage, positionSide):
                 entry_price = hero['open'].iloc[i]
                 position = True
         else:
-            liquidated = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -80
+            if use_trailing:
+                trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -(leverage * callbackrate)
+            else:
+                trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -80
             unrealizedPNL = (hero['open'].iloc[i] - entry_price) / entry_price * 100 * leverage
             breakeven_PNL = fees * leverage
 
-            if (hero[exit_position].iloc[i]) or liquidated:
-                if liquidated:
-                    realized_pnl = -100
+            if (hero[exit_position].iloc[i]) or trailing_stop:
+                if trailing_stop:
+                    if use_trailing: realized_pnl = -breakeven_PNL - (leverage * callbackrate)
+                    else: realized_pnl = -100 
                     liquidations = liquidations + 1
                 else: realized_pnl = unrealizedPNL - breakeven_PNL
 
@@ -62,7 +68,7 @@ def check_PNL(hero, leverage, positionSide):
     if total_pnl != 0:
         print("PNL for " + positionSide + " Positions: " + str(round(total_pnl, 2)) + "%")
         print("Total  Executed  Trades: " + str(round(total_trades, 2)))
-        print("Total Liquidated Trades: " + str(round(liquidations)))
+        print("Triggered Trailing Stop: " + str(round(liquidations)))
         print("_Win Trades: " + str(wintrade))
         print("Lose Trades: " + str(losetrade))
         if (wintrade + losetrade > 1):

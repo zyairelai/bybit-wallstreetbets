@@ -4,7 +4,7 @@ import api_binance
 from datetime import datetime
 from termcolor import colored
 
-callbackRate = 5
+callbackRate = 2
 
 def lets_make_some_money(pair, leverage, quantity): 
     print(pair)

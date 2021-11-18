@@ -1,10 +1,18 @@
+import pandas
 import modules.candlestick
 
-test_module = False
+test_module = True
 
 def swing_trade(pair):
     # Fetch the raw klines data
-    dataset = modules.candlestick.get_klines(pair, '1d')
+    dataset = modules.candlestick.get_klines(pair, '1h')
+    trend = modules.candlestick.get_klines(pair, '1d')[["timestamp", "open"]].copy()
+
+    # Moving Average Trend Line
+    moving_average_threshold = 50
+    trend = trend.rename(columns={'open': 'o'})
+    trend['EMA'] = trend['o'].ewm(span=moving_average_threshold).mean()
+    dataset = pandas.merge_asof(dataset, trend, on='timestamp')
 
     # Temporary Previous 7 days HIGH
     dataset["high_1"] = dataset['high'].shift(1)
@@ -26,10 +34,6 @@ def swing_trade(pair):
     dataset["low_7"] = dataset['low'].shift(7)
     dataset["low_8"] = dataset['low'].shift(8)
 
-    # Moving Average Trend Line
-    moving_average_threshold = 200
-    dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
-
     # Apply Place Order Condition
     dataset["GO_LONG"] = dataset.apply(GO_LONG_CONDITION, axis=1)
     dataset["GO_SHORT"] = dataset.apply(GO_SHORT_CONDITION, axis=1)
@@ -38,7 +42,7 @@ def swing_trade(pair):
     return dataset
 
 indicator = "open"
-# dataset[indicator] < dataset["EMA"]
+moving_average = "EMA"
 
 def GO_LONG_CONDITION(dataset):
     if  dataset[indicator] < dataset["low_8"] and \
@@ -47,7 +51,8 @@ def GO_LONG_CONDITION(dataset):
         dataset[indicator] < dataset["low_4"] and \
         dataset[indicator] < dataset["low_5"] and \
         dataset[indicator] < dataset["low_6"] and \
-        dataset[indicator] < dataset["low_7"]: return True
+        dataset[indicator] < dataset["low_7"] and \
+        dataset[indicator] > dataset[moving_average] : return True
     else: return False
 
 def GO_SHORT_CONDITION(dataset):
@@ -57,7 +62,8 @@ def GO_SHORT_CONDITION(dataset):
         dataset[indicator] > dataset["high_4"] and \
         dataset[indicator] > dataset["high_5"] and \
         dataset[indicator] > dataset["high_6"] and \
-        dataset[indicator] > dataset["high_7"]: return True
+        dataset[indicator] > dataset["high_7"] and \
+        dataset[indicator] < dataset[moving_average] : return True
     else: return False
 
 def EXIT_LONG_CONDITION(dataset):
