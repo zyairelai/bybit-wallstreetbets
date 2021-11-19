@@ -2,6 +2,7 @@ live_trade = False
 
 coin = ["BTC", "ETH", "BNB", "LTC"]
 quantity = [0.001, 0.01, 0.05, 0.1]
+callbackrate = 5
 
 leverage, pair = [], []
 for i in range(len(coin)):

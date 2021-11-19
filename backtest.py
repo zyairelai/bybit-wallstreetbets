@@ -4,7 +4,6 @@ from datetime import datetime
 
 fees = 0.2
 use_trailing = True
-callbackrate = 2
 
 def backtest():
     all_pairs = 0
@@ -45,7 +44,7 @@ def check_PNL(hero, leverage, positionSide):
                 position = True
         else:
             if use_trailing:
-                trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -(leverage * callbackrate)
+                trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -(leverage * config.callbackrate)
             else:
                 trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -80
             unrealizedPNL = (hero['open'].iloc[i] - entry_price) / entry_price * 100 * leverage
@@ -53,7 +52,7 @@ def check_PNL(hero, leverage, positionSide):
 
             if (hero[exit_position].iloc[i]) or trailing_stop:
                 if trailing_stop:
-                    if use_trailing: realized_pnl = -breakeven_PNL - (leverage * callbackrate)
+                    if use_trailing: realized_pnl = -breakeven_PNL - (leverage * config.callbackrate)
                     else: realized_pnl = -100 
                     liquidations = liquidations + 1
                 else: realized_pnl = unrealizedPNL - breakeven_PNL

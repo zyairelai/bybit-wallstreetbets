@@ -80,7 +80,7 @@ def market_close_short(pair, response):
 
 set_hedge_mode()
 
-def trailing_open_long(pair, quantity, callbackRate):
+def trailing_open_long(pair, quantity):
     if live_trade:
         client.futures_create_order(symbol=pair,
                                     quantity=quantity,
@@ -94,11 +94,11 @@ def trailing_open_long(pair, quantity, callbackRate):
                                     positionSide="LONG",
                                     type="TRAILING_STOP_MARKET",
                                     side="SELL",
-                                    callbackRate=callbackRate,
+                                    callbackRate=config.callbackrate,
                                     timestamp=get_timestamp())
     print(colored("🚀 GO_LONG 🚀", "green"))
 
-def trailing_open_short(pair, quantity, callbackRate):
+def trailing_open_short(pair, quantity):
     if live_trade:
         client.futures_create_order(symbol=pair,
                                     quantity=quantity,
@@ -112,6 +112,6 @@ def trailing_open_short(pair, quantity, callbackRate):
                                     positionSide="SHORT",
                                     type="TRAILING_STOP_MARKET",
                                     side="BUY",
-                                    callbackRate=callbackRate,
+                                    callbackRate=config.callbackrate,
                                     timestamp=get_timestamp())
     print(colored("💥 GO_SHORT 💥", "red"))

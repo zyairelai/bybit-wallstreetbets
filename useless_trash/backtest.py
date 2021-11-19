@@ -4,7 +4,6 @@ import pandas, os
 from datetime import datetime
 
 strategy = strategy
-callbackrate = 1
 fees = 0.2
 
 def backtest():

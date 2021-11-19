@@ -4,8 +4,6 @@ import api_binance
 from datetime import datetime
 from termcolor import colored
 
-callbackRate = 2
-
 def lets_make_some_money(pair, leverage, quantity): 
     print(pair)
     response = api_binance.position_information(pair)
@@ -16,7 +14,7 @@ def lets_make_some_money(pair, leverage, quantity):
 
     if api_binance.LONG_SIDE(response) == "NO_POSITION":
         if long_term_low_leverage["GO_LONG"].iloc[-1]:
-            api_binance.trailing_open_long(pair, quantity, callbackRate)
+            api_binance.trailing_open_long(pair, quantity)
         else: print("_LONG_SIDE : 🐺 WAIT 🐺")
 
     if api_binance.LONG_SIDE(response) == "LONGING":
@@ -28,7 +26,7 @@ def lets_make_some_money(pair, leverage, quantity):
 
     if api_binance.SHORT_SIDE(response) == "NO_POSITION":
         if long_term_low_leverage["GO_SHORT"].iloc[-1]:
-            api_binance.trailing_open_short(pair, quantity, callbackRate)
+            api_binance.trailing_open_short(pair, quantity)
         else: print("SHORT_SIDE : 🐺 WAIT 🐺")
 
     if api_binance.SHORT_SIDE(response) == "SHORTING":
