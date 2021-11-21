@@ -1,6 +1,5 @@
 import config
 import api_bybit
-import get_klines
 from termcolor import colored
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler

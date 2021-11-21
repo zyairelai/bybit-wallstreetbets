@@ -3,23 +3,23 @@ import strategy
 from datetime import datetime
 
 fees = 0.2
-use_trailing = True
 
 def backtest():
     all_pairs = 0
     for i in range(len(config.pair)):
         print(config.pair[i])
         leverage = config.leverage[i]
-        hero = strategy.swing_trade(config.pair[i])
+        hero = strategy.long_term_low_leverage(config.pair[i])
         # print(hero)
 
         print("Start Time Since " + str(datetime.fromtimestamp(hero["timestamp"].iloc[0]/1000)))
-        long_result = round(check_PNL(hero, leverage, "_LONG"), 2)
+
+        long_result = round(check_PNL(hero, leverage, "LONG"), 2)
         short_reult = round(check_PNL(hero, leverage, "SHORT"), 2)
         overall_result = round(long_result + short_reult, 2)
         all_pairs = round(all_pairs + overall_result, 2)
-
         print("PNL for _BOTH Positions: " + str(overall_result) + "%\n")
+
     print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
 
 def check_PNL(hero, leverage, positionSide):
@@ -27,7 +27,7 @@ def check_PNL(hero, leverage, positionSide):
     total_pnl, total_trades, liquidations = 0, 0, 0
     wintrade, losetrade = 0, 0
 
-    if positionSide == "_LONG":
+    if positionSide == "LONG":
         open_position = "GO_LONG"
         exit_position = "EXIT_LONG"
         liq_indicator = "low"
@@ -43,7 +43,7 @@ def check_PNL(hero, leverage, positionSide):
                 entry_price = hero['open'].iloc[i]
                 position = True
         else:
-            if use_trailing:
+            if config.use_trailing:
                 trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -(leverage * config.callbackrate)
             else:
                 trailing_stop = (hero[liq_indicator].iloc[i] - entry_price) / entry_price * 100 * leverage < -80
@@ -52,7 +52,7 @@ def check_PNL(hero, leverage, positionSide):
 
             if (hero[exit_position].iloc[i]) or trailing_stop:
                 if trailing_stop:
-                    if use_trailing: realized_pnl = -breakeven_PNL - (leverage * config.callbackrate)
+                    if config.use_trailing: realized_pnl = -breakeven_PNL - (leverage * config.callbackrate)
                     else: realized_pnl = -100 
                     liquidations = liquidations + 1
                 else: realized_pnl = unrealizedPNL - breakeven_PNL

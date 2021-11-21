@@ -7,11 +7,12 @@ from termcolor import colored
 def lets_make_some_money(pair, leverage, quantity): 
     print(pair)
     response = api_binance.position_information(pair)
-    if response[0].get('marginType') != "isolated": api_binance.change_margin_to_ISOLATED(pair)
-    if int(response[0].get("leverage")) != leverage: api_binance.change_leverage(pair, leverage)
-    long_term_low_leverage = strategy.swing_trade(pair)
+    long_term_low_leverage = strategy.long_term_low_leverage(pair)
     # print(long_term_low_leverage)
 
+    if response[0].get('marginType') != "isolated": api_binance.change_margin_to_ISOLATED(pair)
+    if int(response[0].get("leverage")) != leverage: api_binance.change_leverage(pair, leverage)
+    
     if api_binance.LONG_SIDE(response) == "NO_POSITION":
         if long_term_low_leverage["GO_LONG"].iloc[-1]:
             api_binance.trailing_open_long(pair, quantity)
@@ -38,7 +39,7 @@ def lets_make_some_money(pair, leverage, quantity):
         
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
-print(colored("LIVE TRADE IS ENABLED\n", "green")) if config.live_trade else print(colored("THIS IS BACKTESTING\n", "red")) 
+print(colored("LIVE TRADE IS ENABLED\n", "green")) if config.live_trade else print(colored("THIS IS A SHOWCASE\n", "red")) 
 
 try:
     for i in range(len(config.pair)):
@@ -46,4 +47,5 @@ try:
         leverage = config.leverage[i]
         quantity = config.quantity[i]
         lets_make_some_money(pair, leverage, quantity)
+
 except KeyboardInterrupt: print("\n\nAborted.\n")

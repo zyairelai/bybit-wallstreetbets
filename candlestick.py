@@ -1,15 +1,16 @@
 import ccxt
 import pandas
 
-query = 30
+query = 200
 ccxt_client = ccxt.binance()
 tohlcv_colume = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
 def get_klines(pair, interval):
-    return pandas.DataFrame(ccxt_client.fetch_ohlcv(pair, interval , limit=query), columns=tohlcv_colume)
+    return pandas.DataFrame(ccxt_client.fetch_ohlcv(pair, interval, limit=query), columns=tohlcv_colume)
 
 def candlestick(klines):
-    candlestick_df = klines # make a new DataFrame called candlestick_df
+    # Create a new DataFrame called candlestick_df
+    candlestick_df = klines
 
     # Temporary previous column
     candlestick_df["high_s1"] = klines['high'].shift(1)

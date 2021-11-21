@@ -1,10 +1,10 @@
-import modules.candlestick
+import candlestick
 
+indicator = "open"
 test_module = False
 
-def swing_trade(pair):
-    # Fetch the raw klines data
-    dataset = modules.candlestick.get_klines(pair, '1d')
+def long_term_low_leverage(pair):
+    dataset = candlestick.get_klines(pair, '1d')
 
     # Temporary Previous 7 days HIGH
     dataset["high_1"] = dataset['high'].shift(1)
@@ -26,8 +26,9 @@ def swing_trade(pair):
     dataset["low_7"] = dataset['low'].shift(7)
     dataset["low_8"] = dataset['low'].shift(8)
 
-    # Moving Average Trend Line
+    # Moving Average but actually useless
     moving_average_threshold = 200
+    dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
     dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
 
     # Apply Place Order Condition
@@ -36,9 +37,6 @@ def swing_trade(pair):
     dataset["EXIT_LONG"] = dataset.apply(EXIT_LONG_CONDITION, axis=1)
     dataset["EXIT_SHORT"] = dataset.apply(EXIT_SHORT_CONDITION, axis=1)
     return dataset
-
-indicator = "open"
-# dataset[indicator] < dataset["EMA"]
 
 def GO_LONG_CONDITION(dataset):
     if  dataset[indicator] < dataset["low_8"] and \
@@ -81,5 +79,5 @@ def EXIT_SHORT_CONDITION(dataset):
     else: return False
 
 if test_module:
-    long_term_low_leverage = swing_trade("BTCUSDT")
-    print(long_term_low_leverage)
+    swing_trade = long_term_low_leverage("BTCUSDT")
+    print(swing_trade)
