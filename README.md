@@ -106,5 +106,9 @@ Let's make the magic happens!
 python3 trade_binance.py
 ```
 
+**Note:** The command above will only execute the code once.  
+Therefore you need to create your own cronjob or scheduler to keep the code running!  
+Since the code will check on the daily close, it is recommended to set your timer at 00:00 UTC everyday.
+
 <a name="discord"></a>
 ## [JOIN MY DISCORD - QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/r4TnhcdqmT)
