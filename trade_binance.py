@@ -3,7 +3,6 @@ import strategy
 import api_binance
 from datetime import datetime
 from termcolor import colored
-from apscheduler.schedulers.blocking import BlockingScheduler
 
 def lets_make_some_money():
     for i in range(len(config.pair)):
@@ -47,10 +46,5 @@ def lets_make_some_money():
 
 print(colored("LIVE TRADE IS ENABLED\n", "green")) if config.live_trade else print(colored("THIS IS A SHOWCASE\n", "red")) 
 
-try:
-    if config.loop_the_code:
-        scheduler = BlockingScheduler()
-        scheduler.add_job(lets_make_some_money, 'cron', hour='0')
-        scheduler.start()
-    else: lets_make_some_money()
+try: lets_make_some_money()
 except KeyboardInterrupt: print("\n\nAborted.\n")
