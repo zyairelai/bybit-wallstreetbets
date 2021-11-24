@@ -15,7 +15,8 @@
 ## LONG-TERM-LOW-LEVERAGE
 This is a trading bot for **Binance USDT-M Futures**. 
 
-Inspired by [SHORT TERM STRATEGIES THAT WORK](https://www.amazon.com/Short-Term-Trading-Strategies-That/dp/0981923909) by Larry Connors.  
+Inspired by [SHORT TERM STRATEGIES THAT WORK](https://www.amazon.com/Short-Term-Trading-Strategies-That/dp/0981923909) by Larry Connors.
+You can check the detailed explaination https://www.youtube.com/watch?v=_9Bmxylp63Y&list=WL&index=9
 
 <a name="hello_disclaimer"></a>
 ## DISCLAIMER
