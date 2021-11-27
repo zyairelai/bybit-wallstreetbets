@@ -1,7 +1,7 @@
 live_trade = False
 
 use_trailing = True
-callbackrate = 5
+callbackrate = 4
 
 coin = ["BTC", "ETH", "BNB", "LTC"]
 quantity = [0.001, 0.01, 0.05, 0.1]
