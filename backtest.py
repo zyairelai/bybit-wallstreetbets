@@ -1,4 +1,5 @@
 import config
+import pandas
 import strategy
 from datetime import datetime
 
@@ -6,35 +7,59 @@ fees = 0.2
 
 def backtest():
     all_pairs = 0
+    long_pnl_data, short_pnl_data, overall, single_row_data = [], [], [], []
+
     for i in range(len(config.pair)):
-        print(config.pair[i])
+        pair = config.pair[i]
         leverage = config.leverage[i]
-        hero = strategy.long_term_low_leverage(config.pair[i])
+        hero = strategy.long_term_low_leverage(pair)
         # print(hero)
 
-        print("Start Time Since " + str(datetime.fromtimestamp(hero["timestamp"].iloc[0]/1000)))
+        long_pnl_data.append(check_PNL(pair, hero, leverage, "LONG"))
+        short_pnl_data.append(check_PNL(pair, hero, leverage, "SHORT"))
 
-        long_result = round(check_PNL(hero, leverage, "LONG"), 2)
-        short_reult = round(check_PNL(hero, leverage, "SHORT"), 2)
-        overall_result = round(long_result + short_reult, 2)
-        all_pairs = round(all_pairs + overall_result, 2)
-        print("PNL for _BOTH Positions: " + str(overall_result) + "%\n")
+        single_row_data = [(long_pnl_data[i][0]),
+                           (long_pnl_data[i][1] + short_pnl_data[i][1]),
+                           (long_pnl_data[i][2] + short_pnl_data[i][2]),
+                           (long_pnl_data[i][3] + short_pnl_data[i][3]),
+                           ((long_pnl_data[i][4] + short_pnl_data[i][4]) / 2),
+                           (long_pnl_data[i][5] + short_pnl_data[i][5])]
+        overall.append(single_row_data)
 
-    print("ALL PAIRS PNL : " + str(all_pairs) + "%\n")
+    column_name = ["PAIR", "TRADES", "WINS", "LOSES", "WINRATE(%)", "PNL(%)"]
+    long_column = pandas.DataFrame(long_pnl_data, columns = column_name)
+    short_column = pandas.DataFrame(short_pnl_data, columns = column_name)
+    overall = pandas.DataFrame(overall, columns = ["PAIR", "TRADES", "WINS", "LOSES", "WINRATE(%)", "PNL(%)"])
+    print("\nStart Time Since " + str(datetime.fromtimestamp(hero["timestamp"].iloc[0]/1000)) + "\n")
 
-def check_PNL(hero, leverage, positionSide):
+    print("LONG POSITION")
+    print(long_column)
+    print("Avg WINRATE : " + str(round(long_column["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
+    print("Total PNL   : " + str(round(long_column["PNL(%)"].sum(), 2)) + "%\n")
+    
+    print("SHORT POSITION")
+    print(short_column)
+    print("Avg WINRATE : " + str(round(short_column["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
+    print("Total PNL : " + str(round(short_column["PNL(%)"].sum(), 2)) + "%\n")
+
+    print("OVERALL INSIGHT")
+    print(overall)
+    print("Avg WINRATE : " + str(round(overall["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
+    print("Total PNL : " + str(round(overall["PNL(%)"].sum(), 2)) + "%\n")
+
+def check_PNL(pair, hero, leverage, positionSide):
     position = False
     total_pnl, total_trades, liquidations = 0, 0, 0
     wintrade, losetrade = 0, 0
 
     if positionSide == "LONG":
-        open_position = "GO_LONG"
-        exit_position = "EXIT_LONG"
+        open_position = "BUY"
+        exit_position = "SELL"
         liq_indicator = "low"
 
     elif positionSide == "SHORT":
-        open_position = "GO_SHORT"
-        exit_position = "EXIT_SHORT"
+        open_position = "SELL"
+        exit_position = "BUY"
         liq_indicator = "high"
 
     for i in range(len(hero)):
@@ -54,7 +79,7 @@ def check_PNL(hero, leverage, positionSide):
                 if trailing_stop:
                     if config.use_trailing: realized_pnl = -breakeven_PNL - (leverage * config.callbackrate)
                     else: realized_pnl = -100 
-                    liquidations = liquidations + 1
+                    # liquidations = liquidations + 1
                 else: realized_pnl = unrealizedPNL - breakeven_PNL
 
                 if realized_pnl > 0: wintrade = wintrade + 1
@@ -64,17 +89,17 @@ def check_PNL(hero, leverage, positionSide):
                 total_pnl = total_pnl + realized_pnl
                 position = False
 
-    if total_pnl != 0:
-        print("PNL for " + positionSide + " Positions: " + str(round(total_pnl, 2)) + "%")
-        print("Total  Executed  Trades: " + str(round(total_trades, 2)))
-        print("Triggered Trailing Stop: " + str(round(liquidations)))
-        print("_Win Trades: " + str(wintrade))
-        print("Lose Trades: " + str(losetrade))
-        if (wintrade + losetrade > 1):
-            winrate = round(wintrade / (wintrade + losetrade) * 100)
-            print("Winrate : " + str(winrate) + " %")
-        print()
+    pnl_info = []
+    pnl_info.append(pair)
+    pnl_info.append(round(total_trades, 2))
+    # pnl_info.append(round(liquidations))
+    pnl_info.append(wintrade)
+    pnl_info.append(losetrade)
 
-    return round(total_pnl, 2)
+    if wintrade + losetrade > 0: pnl_info.append(round(wintrade / (wintrade + losetrade) * 100))
+    else : pnl_info.append(0)
+
+    pnl_info.append(round(total_pnl, 2))
+    return pnl_info
 
 backtest()

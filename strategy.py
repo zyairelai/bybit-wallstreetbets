@@ -1,13 +1,7 @@
-import candlestick
+import candlestick, config
 
 indicator = "open"
 test_module = False
-
-def long_term_low_leverage(pair):
-    wanted_column = ["timestamp", "open", "high", "low", "close", "volume", "GO_LONG", "GO_SHORT", "EXIT_LONG", "EXIT_SHORT"]
-    dataset = create_dataset(pair)[wanted_column].copy()
-    # bitcoin = create_dataset("BTCUSDT")[wanted_column].copy()
-    return dataset
 
 def create_dataset(pair):
     dataset = candlestick.get_klines(pair, '1d')
@@ -32,20 +26,34 @@ def create_dataset(pair):
     dataset["low_7"] = dataset['low'].shift(7)
     dataset["low_8"] = dataset['low'].shift(8)
 
-    # Moving Average but actually useless
-    # moving_average_threshold = 200
-    # dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
-    # dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
-
     # Apply Place Order Condition
-    dataset["GO_LONG"] = dataset.apply(GO_LONG_CONDITION, axis=1)
-    dataset["GO_SHORT"] = dataset.apply(GO_SHORT_CONDITION, axis=1)
-    dataset["EXIT_LONG"] = dataset.apply(EXIT_LONG_CONDITION, axis=1)
-    dataset["EXIT_SHORT"] = dataset.apply(EXIT_SHORT_CONDITION, axis=1)
+    dataset["BUY"] = dataset.apply(BUY_CONDITION, axis=1)
+    dataset["SELL"] = dataset.apply(SELL_CONDITION, axis=1)
     dataset = dataset.dropna()
     return dataset
 
-def GO_LONG_CONDITION(dataset):
+def long_term_low_leverage(pair):
+    dataset = create_dataset(pair)[["timestamp", "open", "high", "low", "close", "volume", "BUY", "SELL"]].copy()
+
+    if config.follow_bitcoin:
+        buy, sell = [], []
+        dataset = dataset.rename(columns={'BUY': 'BUY_PAIR'})
+        dataset = dataset.rename(columns={'SELL': 'SELL_PAIR'})
+        bitcoin = create_dataset("BTCUSDT")[["BUY", "SELL"]].copy()
+        bitcoin = bitcoin.rename(columns={'BUY': 'BUY_BTC'})
+        bitcoin = bitcoin.rename(columns={'SELL': 'SELL_BTC'})
+
+        for i in range(len(dataset)):
+            buy.append(dataset["BUY_PAIR"].iloc[i] or bitcoin["BUY_BTC"].iloc[i])
+            sell.append(dataset["SELL_PAIR"].iloc[i] or bitcoin["SELL_BTC"].iloc[i])
+        dataset["BUY_BTC"] = bitcoin["BUY_BTC"]
+        dataset["SELL_BTC"] = bitcoin["SELL_BTC"]
+        dataset["BUY"] = buy
+        dataset["SELL"] = sell
+
+    return dataset
+
+def BUY_CONDITION(dataset):
     if  dataset[indicator] < dataset["low_8"] and \
         dataset[indicator] < dataset["low_2"] and \
         dataset[indicator] < dataset["low_3"] and \
@@ -55,7 +63,7 @@ def GO_LONG_CONDITION(dataset):
         dataset[indicator] < dataset["low_7"]: return True
     else: return False
 
-def GO_SHORT_CONDITION(dataset):
+def SELL_CONDITION(dataset):
     if  dataset[indicator] > dataset["high_8"] and \
         dataset[indicator] > dataset["high_2"] and \
         dataset[indicator] > dataset["high_3"] and \
@@ -63,26 +71,6 @@ def GO_SHORT_CONDITION(dataset):
         dataset[indicator] > dataset["high_5"] and \
         dataset[indicator] > dataset["high_6"] and \
         dataset[indicator] > dataset["high_7"]: return True
-    else: return False
-
-def EXIT_LONG_CONDITION(dataset):
-    if  dataset[indicator] > dataset["high_8"] and \
-        dataset[indicator] > dataset["high_2"] and \
-        dataset[indicator] > dataset["high_3"] and \
-        dataset[indicator] > dataset["high_4"] and \
-        dataset[indicator] > dataset["high_5"] and \
-        dataset[indicator] > dataset["high_6"] and \
-        dataset[indicator] > dataset["high_7"] : return True
-    else: return False
-
-def EXIT_SHORT_CONDITION(dataset):
-    if  dataset[indicator] < dataset["low_8"] and \
-        dataset[indicator] < dataset["low_2"] and \
-        dataset[indicator] < dataset["low_3"] and \
-        dataset[indicator] < dataset["low_4"] and \
-        dataset[indicator] < dataset["low_5"] and \
-        dataset[indicator] < dataset["low_6"] and \
-        dataset[indicator] < dataset["low_7"] : return True
     else: return False
 
 if test_module:
