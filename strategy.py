@@ -4,6 +4,12 @@ indicator = "open"
 test_module = False
 
 def long_term_low_leverage(pair):
+    wanted_column = ["timestamp", "open", "high", "low", "close", "volume", "GO_LONG", "GO_SHORT", "EXIT_LONG", "EXIT_SHORT"]
+    dataset = create_dataset(pair)[wanted_column].copy()
+    # bitcoin = create_dataset("BTCUSDT")[wanted_column].copy()
+    return dataset
+
+def create_dataset(pair):
     dataset = candlestick.get_klines(pair, '1d')
 
     # Temporary Previous 7 days HIGH
@@ -27,15 +33,16 @@ def long_term_low_leverage(pair):
     dataset["low_8"] = dataset['low'].shift(8)
 
     # Moving Average but actually useless
-    moving_average_threshold = 200
-    dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
-    dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
+    # moving_average_threshold = 200
+    # dataset['SMA'] = dataset['close'].rolling(window=moving_average_threshold).mean()
+    # dataset['EMA'] = dataset['close'].ewm(span=moving_average_threshold).mean()
 
     # Apply Place Order Condition
     dataset["GO_LONG"] = dataset.apply(GO_LONG_CONDITION, axis=1)
     dataset["GO_SHORT"] = dataset.apply(GO_SHORT_CONDITION, axis=1)
     dataset["EXIT_LONG"] = dataset.apply(EXIT_LONG_CONDITION, axis=1)
     dataset["EXIT_SHORT"] = dataset.apply(EXIT_SHORT_CONDITION, axis=1)
+    dataset = dataset.dropna()
     return dataset
 
 def GO_LONG_CONDITION(dataset):
