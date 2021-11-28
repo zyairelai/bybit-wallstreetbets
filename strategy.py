@@ -37,15 +37,22 @@ def long_term_low_leverage(pair):
 
     if config.follow_bitcoin:
         buy, sell = [], []
-        dataset = dataset.rename(columns={'BUY': 'BUY_PAIR'})
-        dataset = dataset.rename(columns={'SELL': 'SELL_PAIR'})
         bitcoin = create_dataset("BTCUSDT")[["BUY", "SELL"]].copy()
         bitcoin = bitcoin.rename(columns={'BUY': 'BUY_BTC'})
         bitcoin = bitcoin.rename(columns={'SELL': 'SELL_BTC'})
+        dataset = dataset.rename(columns={'BUY': 'BUY_PAIR'})
+        dataset = dataset.rename(columns={'SELL': 'SELL_PAIR'})
+
+        # ethereum = create_dataset("ETHUSDT")[["BUY", "SELL"]].copy()
+        # ethereum = ethereum.rename(columns={'BUY': 'BUY_ETH'})
+        # ethereum = ethereum.rename(columns={'SELL': 'SELL_ETH'})
 
         for i in range(len(dataset)):
             buy.append(dataset["BUY_PAIR"].iloc[i] or bitcoin["BUY_BTC"].iloc[i])
             sell.append(dataset["SELL_PAIR"].iloc[i] or bitcoin["SELL_BTC"].iloc[i])
+            # buy.append(dataset["BUY_PAIR"].iloc[i] or bitcoin["BUY_BTC"].iloc[i] or ethereum["BUY_ETH"].iloc[i])
+            # sell.append(dataset["SELL_PAIR"].iloc[i] or bitcoin["SELL_BTC"].iloc[i] or ethereum["SELL_ETH"].iloc[i])
+
         dataset["BUY_BTC"] = bitcoin["BUY_BTC"]
         dataset["SELL_BTC"] = bitcoin["SELL_BTC"]
         dataset["BUY"] = buy
