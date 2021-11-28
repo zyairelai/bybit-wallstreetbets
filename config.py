@@ -1,6 +1,7 @@
 live_trade = False
-
+enable_scheduler = True
 follow_bitcoin = True
+
 use_trailing = False
 callbackrate = 4
 
@@ -14,6 +15,5 @@ for i in range(len(coin)):
         if   callbackrate <= 1 : leverage.append(50)
         elif callbackrate <= 2 : leverage.append(40)
         elif callbackrate <= 3 : leverage.append(30)
-        elif callbackrate <= 4 : leverage.append(20)
-        elif callbackrate <= 5 : leverage.append(15)
+        elif callbackrate  > 3 : leverage.append(20)
     else: leverage.append(50)

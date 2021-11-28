@@ -1,7 +1,9 @@
 bybit
 ccxt
+pytz
 pandas
 termcolor
+apscheduler
 python-binance
 jsonschema<4.0
 cryptography==3.4.6

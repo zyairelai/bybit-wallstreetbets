@@ -88,6 +88,8 @@ The settings can be configured in `config.py`.
 | Variables           | Description                                                                                                |
 | --------------------| -----------------------------------------------------------------------------------------------------------|
 | `live_trade`        |`True` to place actual order <br /> `False` to see sample output                                            |
+| `enable_scheduler`  |`True` to run the script during UTC 00:00 <br /> `False` to run the script only once                        |
+| `follow_bitcoin`    |`True` to follow Bitcoin Position <br /> `False` to not follow Bitcoin                                      |
 | `use_trailing`      |`True` to set a Trailing Stop <br /> `False` to not using Trailing Stop                                     |
 | `callbackrate`      | Check https://www.binance.com/en/support/faq/360042299292                                                  |
 | `coin`              | You can put your coin list here                                                                            |
@@ -105,10 +107,6 @@ Let's make the magic happens!
 ```
 python3 trade_binance.py
 ```
-
-**Note:** The command above will only execute the code once.  
-Therefore you need to create your own cronjob or scheduler to keep the code running!  
-Since the code will check on the daily close, it is recommended to set your timer at 00:00 UTC everyday.
 
 <a name="discord"></a>
 ## [JOIN MY DISCORD - QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/r4TnhcdqmT)
