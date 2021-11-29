@@ -11,7 +11,7 @@ strategy = strategy
 def lets_make_some_money():
     for i in range(len(config.pair)):
         pair = config.pair[i]
-        leverage = config.leverage[i]
+        leverage = config.leverage
         quantity = config.quantity[i]
 
         print(pair)

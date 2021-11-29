@@ -2,6 +2,7 @@ import config
 import pandas
 import strategy
 from datetime import datetime
+from termcolor import colored
 
 fees = 0.2
 
@@ -11,12 +12,11 @@ def backtest():
 
     for i in range(len(config.pair)):
         pair = config.pair[i]
-        leverage = config.leverage[i]
         hero = strategy.long_term_low_leverage(pair)
         # print(hero)
 
-        long_pnl_data.append(check_PNL(pair, hero, leverage, "LONG"))
-        short_pnl_data.append(check_PNL(pair, hero, leverage, "SHORT"))
+        long_pnl_data.append(check_PNL(pair, hero, "LONG"))
+        short_pnl_data.append(check_PNL(pair, hero, "SHORT"))
 
         single_row_data = [(long_pnl_data[i][0]),
                            (long_pnl_data[i][1] + short_pnl_data[i][1]),
@@ -32,22 +32,23 @@ def backtest():
     overall = pandas.DataFrame(overall, columns = ["PAIR", "TRADES", "WINS", "LOSES", "WINRATE(%)", "PNL(%)"])
     print("\nStart Time Since " + str(datetime.fromtimestamp(hero["timestamp"].iloc[0]/1000)) + "\n")
 
-    print("LONG POSITION")
+    print(colored("LONG POSITION", "green"))
     print(long_column)
     print("Avg WINRATE : " + str(round(long_column["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
     print("Total PNL   : " + str(round(long_column["PNL(%)"].sum(), 2)) + "%\n")
     
-    print("SHORT POSITION")
+    print(colored("SHORT POSITION", "red"))
     print(short_column)
     print("Avg WINRATE : " + str(round(short_column["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
     print("Total PNL : " + str(round(short_column["PNL(%)"].sum(), 2)) + "%\n")
 
-    print("OVERALL INSIGHT")
+    print(colored("OVERALL INSIGHT", "yellow"))
     print(overall)
     print("Avg WINRATE : " + str(round(overall["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
     print("Total PNL : " + str(round(overall["PNL(%)"].sum(), 2)) + "%\n")
 
-def check_PNL(pair, hero, leverage, positionSide):
+def check_PNL(pair, hero, positionSide):
+    leverage = config.leverage
     position = False
     total_pnl, total_trades, liquidations = 0, 0, 0
     wintrade, losetrade = 0, 0
