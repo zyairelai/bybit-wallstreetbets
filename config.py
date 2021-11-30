@@ -2,7 +2,7 @@ live_trade = False
 enable_scheduler = True
 follow_bitcoin = True
 
-use_trailing = True
+use_trailing = False
 callbackrate = 5
 
 coin = ["BTC", "ETH", "BNB", "LTC"] # , "BCH", "XRP", "EOS", "TRX", "ADA", "IOTA", "DOGE", "LINK", "AXS", "ALICE"]
