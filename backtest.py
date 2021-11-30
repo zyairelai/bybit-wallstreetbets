@@ -8,6 +8,7 @@ fees = 0.2
 
 def backtest():
     all_pairs = 0
+    leverage = config.leverage[i]
     long_pnl_data, short_pnl_data, overall, single_row_data = [], [], [], []
 
     for i in range(len(config.pair)):
@@ -15,8 +16,8 @@ def backtest():
         hero = strategy.long_term_low_leverage(pair)
         # print(hero)
 
-        long_pnl_data.append(check_PNL(pair, hero, "LONG"))
-        short_pnl_data.append(check_PNL(pair, hero, "SHORT"))
+        long_pnl_data.append(check_PNL(pair, hero, leverage, "LONG"))
+        short_pnl_data.append(check_PNL(pair, hero, levearge, "SHORT"))
 
         single_row_data = [(long_pnl_data[i][0]),
                            (long_pnl_data[i][1] + short_pnl_data[i][1]),
@@ -47,8 +48,7 @@ def backtest():
     print("Avg WINRATE : " + str(round(overall["WINRATE(%)"].sum() / len(config.pair), 2)) + "%")
     print("Total PNL : " + str(round(overall["PNL(%)"].sum(), 2)) + "%\n")
 
-def check_PNL(pair, hero, positionSide):
-    leverage = config.leverage
+def check_PNL(pair, hero, leverage, positionSide):
     position = False
     total_pnl, total_trades, liquidations = 0, 0, 0
     wintrade, losetrade = 0, 0
