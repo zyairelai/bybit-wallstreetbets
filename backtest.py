@@ -8,16 +8,16 @@ fees = 0.2
 
 def backtest():
     all_pairs = 0
-    leverage = config.leverage[i]
     long_pnl_data, short_pnl_data, overall, single_row_data = [], [], [], []
 
     for i in range(len(config.pair)):
         pair = config.pair[i]
+        leverage = config.leverage[i]
         hero = strategy.long_term_low_leverage(pair)
         # print(hero)
 
         long_pnl_data.append(check_PNL(pair, hero, leverage, "LONG"))
-        short_pnl_data.append(check_PNL(pair, hero, levearge, "SHORT"))
+        short_pnl_data.append(check_PNL(pair, hero, leverage, "SHORT"))
 
         single_row_data = [(long_pnl_data[i][0]),
                            (long_pnl_data[i][1] + short_pnl_data[i][1]),
