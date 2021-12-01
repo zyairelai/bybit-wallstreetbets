@@ -19,7 +19,7 @@ def lets_make_some_money():
 
         if response[0].get('marginType') != "isolated": api_binance.change_margin_to_ISOLATED(pair)
         if int(response[0].get("leverage")) != leverage: api_binance.change_leverage(pair, leverage)
-        
+
         if api_binance.LONG_SIDE(response) == "NO_POSITION":
             if long_term_low_leverage["BUY"].iloc[-1]:
                 api_binance.trailing_open_long(pair, quantity)
@@ -41,12 +41,12 @@ def lets_make_some_money():
                 api_binance.market_close_short(pair, response)
                 api_binance.cancel_all_open_orders(pair)
             else: print(colored("SHORT_SIDE : HOLDING_SHORT", "red"))
-            
+
         print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
 print(colored("LIVE TRADE IS ENABLED\n", "green")) if config.live_trade else print(colored("THIS IS A SHOWCASE\n", "red")) 
 
-if config.enable_scheduler:
+if config.live_trade and config.enable_scheduler:
     scheduler = BlockingScheduler()
     scheduler.add_job(lets_make_some_money, 'cron', hour='0', timezone=utc)
     scheduler.start()

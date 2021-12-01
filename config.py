@@ -11,6 +11,6 @@ quantity = [0.001, 0.01, 0.05, 0.1]
 pair, leverage = [], []
 for i in range(len(coin)):
     pair.append(coin[i] + "USDT")
-    if coin == "BTC": leverage.append(50)
-    elif coin == "ETH": leverage.append(40)
+    if coin[i] == "BTC": leverage.append(50)
+    elif coin[i] == "ETH": leverage.append(40)
     else: leverage.append(30)
