@@ -11,6 +11,7 @@ def lets_make_some_money():
         pair = config.pair[i]
         leverage = config.leverage[i]
         quantity = config.quantity[i]
+        trailing = config.use_trailing
 
         print(pair)
         response = api_binance.position_information(pair)
@@ -22,7 +23,8 @@ def lets_make_some_money():
 
         if api_binance.LONG_SIDE(response) == "NO_POSITION":
             if long_term_low_leverage["BUY"].iloc[-1]:
-                api_binance.trailing_open_long(pair, quantity)
+                if trailing: api_binance.trailing_open_long(pair, quantity)
+                else: api_binance.market_open_long(pair, quantity)
             else: print("_LONG_SIDE : 🐺 WAIT 🐺")
 
         if api_binance.LONG_SIDE(response) == "LONGING":
@@ -33,7 +35,8 @@ def lets_make_some_money():
 
         if api_binance.SHORT_SIDE(response) == "NO_POSITION":
             if long_term_low_leverage["SELL"].iloc[-1]:
-                api_binance.trailing_open_short(pair, quantity)
+                if trailing: api_binance.trailing_open_short(pair, quantity)
+                else: api_binance.market_open_short(pair, quantity)
             else: print("SHORT_SIDE : 🐺 WAIT 🐺")
 
         if api_binance.SHORT_SIDE(response) == "SHORTING":
