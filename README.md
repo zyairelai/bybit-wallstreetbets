@@ -9,7 +9,7 @@
     3. [CONFIGURATIONS](#configurations)
     4. [RUN](#run)
 5. [JOIN-MY-DISCORD](#discord)
-    - [QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/r4TnhcdqmT)
+    - [QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/6J2mXvYsFB)
 
 <a name="long_term_low_leverage"></a>
 ## LONG-TERM-LOW-LEVERAGE
@@ -109,4 +109,4 @@ python3 trade_binance.py
 ```
 
 <a name="discord"></a>
-## [JOIN MY DISCORD - QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/r4TnhcdqmT)
+## [JOIN MY DISCORD - QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/6J2mXvYsFB)
