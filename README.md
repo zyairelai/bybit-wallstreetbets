@@ -10,6 +10,7 @@
     4. [RUN](#run)
 5. [JOIN-MY-DISCORD](#discord)
     - [QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/6J2mXvYsFB)
+    - Please email or create an issue if the invitation link does not work  
 
 <a name="long_term_low_leverage"></a>
 ## LONG-TERM-LOW-LEVERAGE
@@ -110,3 +111,4 @@ python3 trade_binance.py
 
 <a name="discord"></a>
 ## [JOIN MY DISCORD - QUICK ACCESS TO THE DARK DIMENSION](https://discord.gg/6J2mXvYsFB)
+### Please email or create an issue if the invitation link does not work  
