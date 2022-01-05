@@ -22,7 +22,7 @@ You can check the detailed explaination https://www.youtube.com/watch?v=_9Bmxylp
 **This bot is stable therefore no new changes is made until new bugs been spotted.**  
 **I use this bot personally and it works fine for me with stable profits.**  
 **Maybe you might like to checkout my other bots that uses leverage:**  
-- https://github.com/zyairelai/buy-low-sell-high/ (I use this personally)
+- https://github.com/zyairelai/buy-low-sell-high/ (I am actively using this)
 - https://github.com/zyairelai/futures-hero/ (I do not use this personally)
 
 <a name="hello_disclaimer"></a>
