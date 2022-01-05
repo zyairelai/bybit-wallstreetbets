@@ -19,6 +19,12 @@ This is a trading bot for **Binance USDT-M Futures**.
 Inspired by [SHORT TERM STRATEGIES THAT WORK](https://www.amazon.com/Short-Term-Trading-Strategies-That/dp/0981923909) by Larry Connors.
 You can check the detailed explaination https://www.youtube.com/watch?v=_9Bmxylp63Y&list=WL&index=9
 
+**This bot is stable therefore no new changes is made until new bugs been spotted.**  
+**I use this bot personally and it works fine for me with stable profits.**  
+**Maybe you might like to checkout my other bots that uses leverage:**  
+- https://github.com/zyairelai/buy-low-sell-high/ (I use this personally)
+- https://github.com/zyairelai/futures-hero/ (I do not use this personally)
+
 <a name="hello_disclaimer"></a>
 ## DISCLAIMER
 I have no responsibility for any loss or hardship incurred directly or indirectly by using this code.
