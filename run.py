@@ -36,17 +36,33 @@ def fetch_heikin_ashi(symbol='BTC/USDT', timeframe='1d'):
     return ha_candles[-1]  # Return the most recent Heikin-Ashi candle
 
 def close_active_positions(symbol='BTCUSDT'):
-    response = client.get_positions(category='linear', symbol=symbol)
-    position = response['result']['list'][0] if response['result']['list'] else None
+    try:
+        # Fetch open positions
+        response = client.get_positions(category='linear', symbol=symbol)
+        # print(response)
+        position = response['result']['list'][0] if response['result']['list'] else None
+        
+        if position and position['size'] != '0':
+            side = 'Sell' if position['side'] == 'Buy' else 'Buy'  # Determine the opposite side
+            qty = position['size']
+            
+            # Place a market order to close the position
+            close_response = client.place_order(
+                symbol=symbol,
+                side=side,
+                order_type='Market',
+                qty=0,  # Use actual quantity of the position
+                reduce_only=True,  # Set reduce_only to true
+                category='linear',  # Ensure correct category
+                position_idx=0  # Use 0 for one-way mode
+            )
+            print(f"Closed position on {symbol} with side {side} and qty {qty}")
+            # print(f"Close order response: {close_response}")
+        else:
+            print(f"No open position to close for {symbol}")
     
-    if position and position['size'] != '0':
-        side = 'Sell' if position['side'] == 'Buy' else 'Buy'  # Opposite side
-        qty = position['size']
-        # Close the position with a market order
-        client.place_order(symbol=symbol, side=side, qty=qty, order_type='Market')
-        print(f"Closed position on {symbol} with side {side} and qty {qty}")
-    else:
-        print(f"No open position to close for {symbol}")
+    except Exception as e:
+        print(f"Error closing position: {e}")
 
 def get_leverage(symbol):
     return int(client.get_positions(category="linear",symbol=symbol)['result']['list'][0]['leverage'])
@@ -75,7 +91,7 @@ def wallstreetbet():
     body_size_pct = (abs(ha_candle['close'] - ha_candle['open']) / ha_candle['open']) * 100
 
     close_active_positions(symbol)
-    time.sleep(1)
+    time.sleep(3)
 
     if body_size_pct > 0.5:
         if ha_candle['close'] > ha_candle['open']:
