@@ -91,7 +91,7 @@ def wallstreetbet():
     body_size_pct = (abs(ha_candle['close'] - ha_candle['open']) / ha_candle['open']) * 100
 
     close_active_positions(symbol)
-    time.sleep(3)
+    time.sleep(60)
 
     if body_size_pct > 0.5:
         if ha_candle['close'] > ha_candle['open']:
