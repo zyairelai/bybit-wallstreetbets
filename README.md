@@ -1,4 +1,4 @@
-# WallStreetBet
+# Wall-Street-Bet
 1. Close any active trades at UTC 00:00, regardless of profit or loss.
 2. Wait 1 minute after closing the trade.
 3. Check the 1D Heikin-Ashi candle at UTC 00:00.
