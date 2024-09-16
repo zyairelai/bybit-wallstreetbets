@@ -1,21 +1,12 @@
 #!/bin/python3
 
-live_trade = True
-
 import ccxt, os, pandas, requests
+from datetime import datetime
 from pybit.unified_trading import HTTP 
-
-if live_trade: print("------ LIVE TRADE IS ENABLED ------\n")
 
 coin = "BTC"
 leverage = 50
 trade_qty = 0.001
-
-# Print for confirmation
-pair = coin + "USDT"
-print("\nPair Name  : " + pair)
-print("Quantity   : " + str(trade_qty) + " " + coin)
-print("Leverage   : " + str(leverage) + "\n")
 
 exchange = ccxt.bybit()
 client = HTTP(
@@ -30,6 +21,7 @@ def telegram_bot_sendtext(bot_message):
     response = requests.get(send_text)
     return response.json()
 
+pair = coin + "USDT"
 candlequery = 10
 ccxt_client = ccxt.bybit()
 tohlcv_colume = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
@@ -95,13 +87,11 @@ def set_leverage(pair, leverage, response):
         print(f"Leverage set to {leverage} for {pair}.")
 
 def market_open_long(pair, trade_qty):
-    if live_trade:
-        client.place_order(category="linear", symbol=pair, side='Buy', qty=trade_qty, order_type='Market')
+    client.place_order(category="linear", symbol=pair, side='Buy', qty=trade_qty, order_type='Market')
     print("🚀 GO_LONG 🚀")
 
 def market_open_short(pair, trade_qty):
-    if live_trade:
-        client.place_order(category="linear", symbol=pair, side='Sell', qty=trade_qty, order_type='Market')
+    client.place_order(category="linear", symbol=pair, side='Sell', qty=trade_qty, order_type='Market')
     print("💥 GO_SHORT 💥")
 
 def market_close_long(pair):
@@ -164,6 +154,8 @@ def wallstreetbet(pair, leverage, trade_qty):
                 market_close_short()
         else:
             print("YOU FUCKED UP")
+    
+    print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
 # Let's Get Rich
 wallstreetbet(pair, leverage, trade_qty)
