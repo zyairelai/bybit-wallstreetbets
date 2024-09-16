@@ -2,7 +2,7 @@
 
 live_trade = True
 
-import ccxt, os, pandas, requests
+import ccxt, os, pandas, requests, sys
 from pybit.unified_trading import HTTP 
 
 if live_trade: print("------ LIVE TRADE IS ENABLED ------\n")
