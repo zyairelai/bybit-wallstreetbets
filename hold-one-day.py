@@ -4,7 +4,7 @@ import ccxt, os, pandas, time
 from datetime import datetime
 from pybit.unified_trading import HTTP 
 
-live_trade = False
+live_trade = True
 
 coin = "BTC"
 leverage = 50
