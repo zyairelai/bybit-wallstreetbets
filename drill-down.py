@@ -1,21 +1,12 @@
 #!/bin/python3
 
-live_trade = True
-
-import ccxt, os, pandas, requests, sys
+import ccxt, os, pandas, requests
+from datetime import datetime
 from pybit.unified_trading import HTTP 
-
-if live_trade: print("------ LIVE TRADE IS ENABLED ------\n")
 
 coin = "BTC"
 leverage = 50
 trade_qty = 0.001
-
-# Print for confirmation
-pair = coin + "USDT"
-print("\nPair Name  : " + pair)
-print("Quantity   : " + str(trade_qty) + " " + coin)
-print("Leverage   : " + str(leverage) + "\n")
 
 exchange = ccxt.bybit()
 client = HTTP(
@@ -30,6 +21,7 @@ def telegram_bot_sendtext(bot_message):
     response = requests.get(send_text)
     return response.json()
 
+pair = coin + "USDT"
 candlequery = 10
 ccxt_client = ccxt.bybit()
 tohlcv_colume = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
@@ -95,13 +87,11 @@ def set_leverage(pair, leverage, response):
         print(f"Leverage set to {leverage} for {pair}.")
 
 def market_open_long(pair, trade_qty):
-    if live_trade:
-        client.place_order(category="linear", symbol=pair, side='Buy', qty=trade_qty, order_type='Market')
+    client.place_order(category="linear", symbol=pair, side='Buy', qty=trade_qty, order_type='Market')
     print("🚀 GO_LONG 🚀")
 
 def market_open_short(pair, trade_qty):
-    if live_trade:
-        client.place_order(category="linear", symbol=pair, side='Sell', qty=trade_qty, order_type='Market')
+    client.place_order(category="linear", symbol=pair, side='Sell', qty=trade_qty, order_type='Market')
     print("💥 GO_SHORT 💥")
 
 def market_close_long(pair):
@@ -120,50 +110,47 @@ def wallstreetbet(pair, leverage, trade_qty):
     direction = heikin_ashi(get_klines(pair, "1d"))
     twelve_hr = heikin_ashi(get_klines(pair, "12h"))
     six_hour = heikin_ashi(get_klines(pair, "6h"))
-    four_hrs = heikin_ashi(get_klines(pair, "4h"))
     two_hour = heikin_ashi(get_klines(pair, "2h"))
     one_hour = heikin_ashi(get_klines(pair, "1h"))
     decimal_place = 1
     # print(direction)
 
     if response['size'] == '0': # Open Long Position
-        if direction['candle'].iloc[-1] == "GREEN" and direction['close'].iloc[-1] > direction['close'].iloc[-2] and \
-            twelve_hr['candle'].iloc[-1] == "GREEN" and \
-                twelve_hr['close'].iloc[-1] > twelve_hr['close'].iloc[-2] and twelve_hr['close'].iloc[-1] > twelve_hr['close'].iloc[-3] and \
-                twelve_hr['body'].iloc[-1] > twelve_hr['body'].iloc[-2] and twelve_hr['body'].iloc[-1] > twelve_hr['body'].iloc[-3] and \
-            six_hour['candle'].iloc[-1] == "GREEN" and \
-                six_hour['close'].iloc[-1] > six_hour['close'].iloc[-2] and six_hour['close'].iloc[-1] > six_hour['close'].iloc[-3] and \
-                six_hour['body'].iloc[-1] > six_hour['body'].iloc[-2] and six_hour['body'].iloc[-1] > six_hour['body'].iloc[-3] and \
-            four_hrs['candle'].iloc[-1] == "GREEN" and four_hrs['close'].iloc[-1] > four_hrs['close'].iloc[-2] and four_hrs['body'].iloc[-1] > four_hrs['body'].iloc[-2] and \
-            two_hour['candle'].iloc[-1] == "GREEN" and two_hour['close'].iloc[-1] > two_hour['close'].iloc[-2] and two_hour['body'].iloc[-1] > two_hour['body'].iloc[-2] and \
-            one_hour['candle'].iloc[-1] == "GREEN" and one_hour['close'].iloc[-1] > one_hour['close'].iloc[-2] and one_hour['body'].iloc[-1] > one_hour['body'].iloc[-2]:
+        if direction['candle'].iloc[-1] == "GREEN" and direction['close'].iloc[-1] > direction['close'].iloc[-2] and twelve_hr['close'].iloc[-1] > twelve_hr['close'].iloc[-3] and \
+            twelve_hr['candle'].iloc[-1] == "GREEN" and twelve_hr['close'].iloc[-1] > twelve_hr['close'].iloc[-2] and twelve_hr['close'].iloc[-1] > twelve_hr['close'].iloc[-3] and \
+            six_hour['candle'].iloc[-1] == "GREEN" and six_hour['close'].iloc[-1] > six_hour['close'].iloc[-2] and six_hour['close'].iloc[-1] > six_hour['close'].iloc[-3] and six_hour['body'].iloc[-1] > six_hour['body'].iloc[-2] and \
+            two_hour['candle'].iloc[-1] == "GREEN" and two_hour['close'].iloc[-1] > two_hour['close'].iloc[-2] and two_hour['close'].iloc[-1] > two_hour['close'].iloc[-3] and two_hour['body'].iloc[-1] > two_hour['body'].iloc[-2] and \
+            one_hour['candle'].iloc[-1] == "GREEN" and one_hour['close'].iloc[-1] > one_hour['close'].iloc[-2] and one_hour['close'].iloc[-1] > one_hour['close'].iloc[-3] and one_hour['body'].iloc[-1] > one_hour['body'].iloc[-2]:
             market_open_long(pair, trade_qty)
             telegram_bot_sendtext("BYBIT" + str(coin) + " 🚀 LONG 🚀 at " + str(round(float(response.get("markPrice")), decimal_place)))
 
-        if direction['candle'].iloc[-1] == "RED" and direction['close'].iloc[-1] < direction['close'].iloc[-2] and \
-            twelve_hr['candle'].iloc[-1] == "RED" and \
-                twelve_hr['close'].iloc[-1] < twelve_hr['close'].iloc[-2] and twelve_hr['close'].iloc[-1] < twelve_hr['close'].iloc[-3] and \
-                twelve_hr['body'].iloc[-1] > twelve_hr['body'].iloc[-2] and twelve_hr['body'].iloc[-1] > twelve_hr['body'].iloc[-3] and \
-            six_hour['candle'].iloc[-1] == "RED" and \
-                six_hour['close'].iloc[-1] < six_hour['close'].iloc[-2] and six_hour['close'].iloc[-1] < six_hour['close'].iloc[-3] and \
-                six_hour['body'].iloc[-1] > six_hour['body'].iloc[-2] and six_hour['body'].iloc[-1] > six_hour['body'].iloc[-3] and \
-            four_hrs['candle'].iloc[-1] == "RED" and four_hrs['close'].iloc[-1] < four_hrs['close'].iloc[-2] and four_hrs['body'].iloc[-1] > four_hrs['body'].iloc[-2] and \
-            two_hour['candle'].iloc[-1] == "RED" and two_hour['close'].iloc[-1] < two_hour['close'].iloc[-2] and two_hour['body'].iloc[-1] > two_hour['body'].iloc[-2] and \
-            one_hour['candle'].iloc[-1] == "RED" and one_hour['close'].iloc[-1] < one_hour['close'].iloc[-2] and one_hour['body'].iloc[-1] > one_hour['body'].iloc[-2]:
+        if direction['candle'].iloc[-1] == "RED" and direction['close'].iloc[-1] < direction['close'].iloc[-2] and twelve_hr['close'].iloc[-1] < twelve_hr['close'].iloc[-3] and \
+            twelve_hr['candle'].iloc[-1] == "RED" and twelve_hr['close'].iloc[-1] < twelve_hr['close'].iloc[-2] and twelve_hr['close'].iloc[-1] < twelve_hr['close'].iloc[-3] and \
+            six_hour['candle'].iloc[-1] == "RED" and six_hour['close'].iloc[-1] < six_hour['close'].iloc[-2] and six_hour['close'].iloc[-1] < six_hour['close'].iloc[-3] and six_hour['body'].iloc[-1] > six_hour['body'].iloc[-2] and \
+            two_hour['candle'].iloc[-1] == "RED" and two_hour['close'].iloc[-1] < two_hour['close'].iloc[-2] and two_hour['close'].iloc[-1] < two_hour['close'].iloc[-3] and two_hour['body'].iloc[-1] > two_hour['body'].iloc[-2] and \
+            one_hour['candle'].iloc[-1] == "RED" and one_hour['close'].iloc[-1] < one_hour['close'].iloc[-2] and one_hour['close'].iloc[-1] < one_hour['close'].iloc[-3] and one_hour['body'].iloc[-1] > one_hour['body'].iloc[-2]:
             market_open_short(pair, trade_qty)
             telegram_bot_sendtext("BYBIT" + str(coin) + " 💥 SHORT 💥 at " + str(round(float(response.get("markPrice")), decimal_place)))
 
-    else:
-        if response['size'] > '0':
-            if direction['candle'].iloc[-1] != "GREEN" or twelve_hr['candle'].iloc[-1] != "GREEN" or six_hour['candle'].iloc[-1] != "GREEN" or \
-                four_hrs['candle'].iloc[-1] != "GREEN" or two_hour['candle'].iloc[-1] != "GREEN" or one_hour['candle'].iloc[-1] != "GREEN":
-                market_close_long()
-        elif response['size'] < '0':
-            if direction['candle'].iloc[-1] != "RED" or twelve_hr['candle'].iloc[-1] != "RED" or six_hour['candle'].iloc[-1] != "RED" or \
-                four_hrs['candle'].iloc[-1] != "RED" or two_hour['candle'].iloc[-1] != "RED" or one_hour['candle'].iloc[-1] != "RED":
-                market_close_short()
-        else:
-            print("YOU FUCKED UP")
+    # else:
+    #     if response['size'] > '0':
+    #         if direction['candle'].iloc[-1] != "GREEN" or \
+    #             twelve_hr['candle'].iloc[-1] != "GREEN" or \
+    #             six_hour['candle'].iloc[-1] != "GREEN" or \
+    #             two_hour['candle'].iloc[-1] != "GREEN" or \
+    #             one_hour['candle'].iloc[-1] != "GREEN":
+    #             market_close_long()
+    #     elif response['size'] < '0':
+    #         if direction['candle'].iloc[-1] != "RED" or \
+    #             twelve_hr['candle'].iloc[-1] != "RED" or \
+    #             six_hour['candle'].iloc[-1] != "RED" or \
+    #             two_hour['candle'].iloc[-1] != "RED" or \
+    #             one_hour['candle'].iloc[-1] != "RED":
+    #             market_close_short()
+    #     else:
+    #         print("YOU FUCKED UP")
+    
+    print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
 # Let's Get Rich
 wallstreetbet(pair, leverage, trade_qty)

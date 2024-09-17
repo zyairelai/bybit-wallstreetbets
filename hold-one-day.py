@@ -1,8 +1,14 @@
 #!/bin/python3
 
-import ccxt, time, os
+import ccxt, os, pandas, time
 from datetime import datetime
 from pybit.unified_trading import HTTP 
+
+live_trade = False
+
+coin = "BTC"
+leverage = 50
+trade_qty = 0.001
 
 exchange = ccxt.bybit()
 client = HTTP(
@@ -10,90 +16,106 @@ client = HTTP(
     api_key=os.environ.get('BYBIT_KEY'),
     api_secret=os.environ.get('BYBIT_SECRET'))
 
-def fetch_heikin_ashi(symbol='BTC/USDT', timeframe='1d'):
-    ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=3)
-    ha_candles = []
-    
-    for i in range(len(ohlcv)):
-        if i == 0:
-            ha_open = (ohlcv[i][1] + ohlcv[i][4]) / 2
-            ha_close = (ohlcv[i][1] + ohlcv[i][2] + ohlcv[i][3] + ohlcv[i][4]) / 4
-        else:
-            ha_open = (ha_candles[-1]['open'] + ha_candles[-1]['close']) / 2
-            ha_close = (ohlcv[i][1] + ohlcv[i][2] + ohlcv[i][3] + ohlcv[i][4]) / 4
-        
-        ha_high = max(ohlcv[i][2], ha_open, ha_close)
-        ha_low = min(ohlcv[i][3], ha_open, ha_close)
-        
-        ha_candles.append({
-            'timestamp': ohlcv[i][0],
-            'open': ha_open,
-            'high': ha_high,
-            'low': ha_low,
-            'close': ha_close
-        })
-    
-    return ha_candles[-1]  # Return the most recent Heikin-Ashi candle
+pair = coin + "USDT"
+candlequery = 10
+ccxt_client = ccxt.bybit()
+tohlcv_colume = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
 
-def close_active_positions(symbol='BTCUSDT'):
-    response = client.get_positions(category='linear', symbol=symbol)
-    # print(response)
+def get_klines(pair, interval):
+    return pandas.DataFrame(ccxt_client.fetch_ohlcv(pair, interval , limit=candlequery), columns=tohlcv_colume)
+
+def heikin_ashi(klines):
+    heikin_ashi_df = pandas.DataFrame(index=klines.index.values, columns=['open', 'high', 'low', 'close'])
+    heikin_ashi_df['close'] = (klines['open'] + klines['high'] + klines['low'] + klines['close']) / 4
+
+    for i in range(len(klines)):
+        if i == 0: heikin_ashi_df.iat[0, 0] = klines['open'].iloc[0]
+        else: heikin_ashi_df.iat[i, 0] = (heikin_ashi_df.iat[i-1, 0] + heikin_ashi_df.iat[i-1, 3]) / 2
+
+    heikin_ashi_df['high'] = heikin_ashi_df.loc[:, ['open', 'close']].join(klines['high']).max(axis=1)
+    heikin_ashi_df['low']  = heikin_ashi_df.loc[:, ['open', 'close']].join(klines['low']).min(axis=1)
+    heikin_ashi_df["color"] = heikin_ashi_df.apply(color, axis=1)
+    heikin_ashi_df.insert(0,'timestamp', klines['timestamp'])
+    heikin_ashi_df["volume"] = klines["volume"]
+    heikin_ashi_df["upper"] = heikin_ashi_df.apply(upper_wick, axis=1)
+    heikin_ashi_df["lower"] = heikin_ashi_df.apply(lower_wick, axis=1)
+    heikin_ashi_df["body"]  = abs(heikin_ashi_df['open'] - heikin_ashi_df['close'])
+    heikin_ashi_df["indecisive"] = heikin_ashi_df.apply(is_indecisive, axis=1)
+    heikin_ashi_df["candle"] = heikin_ashi_df.apply(valid_candle, axis=1)
+
+    return heikin_ashi_df
+
+def color(HA):
+    if   HA['open'] < HA['close']: return "GREEN"
+    elif HA['open'] > HA['close']: return "RED"
+    else: return "INDECISIVE"
+
+def upper_wick(HA):
+    if HA['color'] == "GREEN": return HA['high'] - HA['close']
+    elif HA['color'] == "RED": return HA['high'] - HA['open']
+    else: return (HA['high'] - HA['open'] + HA['high'] - HA['close']) / 2
+
+def lower_wick(HA):
+    if HA['color'] == "GREEN": return  HA['open'] - HA['low']
+    elif HA['color'] == "RED": return HA['close'] - HA['low']
+    else: return (HA['open'] - HA['low'] + HA['close'] - HA['low']) / 2
+
+def is_indecisive(HA):
+    if HA['upper'] > HA['body'] and HA['lower'] > HA['body']: return True
+    else: return False
+
+def valid_candle(HA):
+    if not HA['indecisive']:
+        if HA['color'] == "GREEN": return "GREEN"
+        elif HA['color'] == "RED": return "RED"
+    else: return "INDECISIVE"
+
+def position_information(pair):
+    response = client.get_positions(category='linear', symbol=pair)
     position = response['result']['list'][0] if response['result']['list'] else None
-    
-    if position and position['size'] != '0':
-        side = 'Sell' if position['side'] == 'Buy' else 'Buy'  # Determine the opposite side
-        qty = position['size']
-        
-        # Place a market order to close the position
-        close_response = client.place_order(
-            symbol=symbol,
-            side=side,
-            order_type='Market',
-            qty=0,  # Use actual quantity of the position
-            reduce_only=True,  # Set reduce_only to true
-            category='linear',  # Ensure correct category
-            position_idx=0  # Use 0 for one-way mode
-        )
-        print(f"Closed position on {symbol} with side {side} and qty {qty}")
-        # print(f"Close order response: {close_response}")
-    else:
-        print(f"No open position to close for {symbol}")
+    return position
 
-def place_order(symbol='BTCUSDT', side='Buy', leverage=50, qty=0.001):
-    current_leverage = int(client.get_positions(category="linear",symbol=symbol)['result']['list'][0]['leverage'])
-    
+def set_leverage(pair, leverage, response):
+    current_leverage = int(response['leverage'])
     if current_leverage and int(current_leverage) != leverage:
-        client.set_leverage(
-            symbol=symbol,
-            category='linear',
-            buyLeverage=str(leverage),
-            sellLeverage=str(leverage)
-        )
-        print(f"Leverage set to {leverage} for {symbol}.")
+        client.set_leverage(symbol=pair, category='linear', buyLeverage=str(leverage), sellLeverage=str(leverage))
+        print(f"Leverage set to {leverage} for {pair}.")
+
+def market_open_long(pair, trade_qty):
+    if live_trade: client.place_order(category="linear", symbol=pair, side='Buy', qty=trade_qty, order_type='Market')
+    print("🚀 GO_LONG 🚀")
+
+def market_open_short(pair, trade_qty):
+    if live_trade: client.place_order(category="linear", symbol=pair, side='Sell', qty=trade_qty, order_type='Market')
+    print("💥 GO_SHORT 💥")
+
+def market_close_long(pair):
+    if live_trade: client.place_order(symbol=pair, side='Sell', order_type='Market', qty=0, reduce_only=True, category='linear', position_idx=0)
+    print("💰 CLOSED_LONG 💰")
+
+def market_close_short(pair):
+    if live_trade: client.place_order(symbol=pair, side='Buy', order_type='Market', qty=0, reduce_only=True, category='linear', position_idx=0)
+    print("💰 CLOSED_SHORT 💰")
+
+def wallstreetbet(pair, leverage, trade_qty):
+    response = position_information(pair)
+    # print(response)
+
+    set_leverage(pair, leverage, response)
+    direction = heikin_ashi(get_klines(pair, "1d"))
+    # print(direction)
     
-    client.place_order(category="linear", symbol=symbol, side=side, qty=qty, order_type='Market')
-    print(f"Placed {side} order on {symbol} with qty {qty}")
+    if response['size'] > '0': market_close_long(pair)
+    elif response['size'] < '0': market_close_short(pair)
+    else: print("No position opened")
 
-def wallstreetbet():
-    symbol = 'BTCUSDT'
-    leverage = 50
-    trade_qty = 0.001
+    time.sleep(3)
 
-    ha_candle = fetch_heikin_ashi(symbol)
-    body_size_pct = (abs(ha_candle['close'] - ha_candle['open']) / ha_candle['open']) * 100
+    if direction['candle'].iloc[-1] == "GREEN": market_open_long(pair, trade_qty)
+    elif direction['candle'].iloc[-1] == "RED": market_open_short(pair, trade_qty)
+    else: print("No Trade Today")
 
-    close_active_positions(symbol)
-    time.sleep(60)
-
-    if body_size_pct > 0.5:
-        if ha_candle['close'] > ha_candle['open']:
-            print(f"Going long on {symbol}")
-            place_order(symbol, 'Buy', leverage, trade_qty)
-        elif ha_candle['close'] < ha_candle['open']:
-            print(f"Going short on {symbol}")
-            place_order(symbol, 'Sell', leverage, trade_qty)
-    else:
-        print(f"Skipping trade on {symbol} due to small body size")
+    print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
 
 # Let's Get Rich
-wallstreetbet()
+wallstreetbet(pair, leverage, trade_qty)
