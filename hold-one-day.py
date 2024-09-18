@@ -102,8 +102,7 @@ def wallstreetbet(pair, leverage, trade_qty):
     # print(response)
 
     set_leverage(pair, leverage, response)
-    direction_day = heikin_ashi(get_klines(pair, "1d"))
-    direction_12h = heikin_ashi(get_klines(pair, "12h"))
+    direction = heikin_ashi(get_klines(pair, "12h"))
     # print(direction)
 
     if response['size'] > '0': market_close_long(pair)
@@ -112,8 +111,8 @@ def wallstreetbet(pair, leverage, trade_qty):
 
     time.sleep(60)
 
-    if direction_day['candle'].iloc[-1] == "GREEN" and direction_12h['candle'].iloc[-1] == "GREEN": market_open_long(pair, trade_qty)
-    elif direction_day['candle'].iloc[-1] == "RED" and direction_12h['candle'].iloc[-1] == "RED": market_open_short(pair, trade_qty)
+    if direction['candle'].iloc[-1] == "GREEN" and direction['body'].iloc[-1] > direction['body'].iloc[-2]: market_open_long(pair, trade_qty)
+    elif direction['candle'].iloc[-1] == "RED" and direction['body'].iloc[-1] > direction['body'].iloc[-2]: market_open_short(pair, trade_qty)
     else: print("No Trade Today")
 
     print("Last action executed @ " + datetime.now().strftime("%H:%M:%S") + "\n")
